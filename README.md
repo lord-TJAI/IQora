@@ -1,3 +1,3 @@
 # IQora
 
-tesint by loki
+tesing by loki
