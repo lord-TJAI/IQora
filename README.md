@@ -233,7 +233,7 @@ pnpm exec tsc --noEmit   # 0 errors expected
 ---
 
 ## 🤝 Contributing
-
+LINK : https://i-qora.vercel.app/student/home
 This is a demo build. For feature proposals or bug reports, open an issue or submit a PR against the `main` branch.
 
 ---
