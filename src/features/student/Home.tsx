@@ -1,34 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import {
   ArrowRight,
   Flame,
   Star,
-  Sparkles,
   BookOpen,
   Target,
   Trophy,
   FastForward,
   Check,
+  X,
   Atom,
   FlaskConical,
   BookMarked,
   Calculator,
+  Award,
+  Zap,
+  Lock,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export const StudentHome: React.FC = () => {
   const navigate = useNavigate();
   const { studentData } = useAuthStore();
+  const [activeTab, setActiveTab] = useState<'activity' | 'work'>('activity');
 
   // 4 Subjects matching demo_screen.png aesthetic
   const subjects = [
     {
       id: 'mathematics',
       name: 'Math',
-      topics: 'Algebra • Calculus • Geometry • Vectors',
-      mastery: 78,
+      topics: 'Algebra • Calculus\nGeometry • More',
+      mastery: 68,
       accentColor: '#4F7CFF',
       bgColor: '#EFF4FF',
       btnColor: 'bg-[#4F7CFF] hover:bg-[#3D6CE6] text-white',
@@ -39,8 +44,8 @@ export const StudentHome: React.FC = () => {
     {
       id: 'physics',
       name: 'Physics',
-      topics: 'Mechanics • Thermodynamics • Electrostatics',
-      mastery: 72,
+      topics: 'Mechanics • Thermodynamics\nElectromagnetism • More',
+      mastery: 42,
       accentColor: '#7C4DFF',
       bgColor: '#F5F0FF',
       btnColor: 'bg-[#7C4DFF] hover:bg-[#6C3AE8] text-white',
@@ -51,8 +56,8 @@ export const StudentHome: React.FC = () => {
     {
       id: 'chemistry',
       name: 'Chemistry',
-      topics: 'Organic • Inorganic • Physical • More',
-      mastery: 64,
+      topics: 'Organic • Inorganic\nPhysical • More',
+      mastery: 35,
       accentColor: '#20C997',
       bgColor: '#E8F9F4',
       btnColor: 'bg-[#20C997] hover:bg-[#1BAF83] text-white',
@@ -63,8 +68,8 @@ export const StudentHome: React.FC = () => {
     {
       id: 'english',
       name: 'English',
-      topics: 'Grammar • Vocabulary • Comprehension • More',
-      mastery: 81,
+      topics: 'Grammar • Vocabulary\nComprehension • More',
+      mastery: 58,
       accentColor: '#FF8A3D',
       bgColor: '#FFF3EB',
       btnColor: 'bg-[#FF8A3D] hover:bg-[#E87528] text-white',
@@ -74,35 +79,7 @@ export const StudentHome: React.FC = () => {
     },
   ];
 
-  // Work due soon: maximum 3 items, concise & actionable
-  const workDue = [
-    {
-      id: 'task-1',
-      title: 'Physics Electrostatics Assignment',
-      subject: 'Physics',
-      dueLabel: 'Due today',
-      urgent: true,
-      color: '#7C4DFF',
-    },
-    {
-      id: 'task-2',
-      title: 'Chemistry Electrochemistry Homework',
-      subject: 'Chemistry',
-      dueLabel: 'Due tomorrow',
-      urgent: false,
-      color: '#20C997',
-    },
-    {
-      id: 'task-3',
-      title: 'Mathematics Calculus Practice Test',
-      subject: 'Mathematics',
-      dueLabel: 'Due Friday',
-      urgent: false,
-      color: '#4F7CFF',
-    },
-  ];
-
-  // Week days for streak tracker
+  // Week days for streak tracker (matching demo_screen.png)
   const weekDays = [
     { day: 'Mon', completed: true },
     { day: 'Tue', completed: true },
@@ -113,66 +90,116 @@ export const StudentHome: React.FC = () => {
     { day: 'Sun', completed: false },
   ];
 
+  // Recent Activity matching demo_screen.png
+  const recentActivities = [
+    {
+      id: 'act-1',
+      title: 'Solved 10 Math questions',
+      time: '2 hours ago',
+      type: 'success',
+      icon: Check,
+      color: '#20C997',
+      bgColor: '#E8F9F4',
+    },
+    {
+      id: 'act-2',
+      title: "Learned: Newton's Laws",
+      time: '5 hours ago',
+      type: 'learn',
+      icon: BookOpen,
+      color: '#7C4DFF',
+      bgColor: '#F5F0FF',
+    },
+    {
+      id: 'act-3',
+      title: 'Completed English Vocabulary Set 1',
+      time: 'Yesterday',
+      type: 'learn',
+      icon: BookMarked,
+      color: '#FF8A3D',
+      bgColor: '#FFF3EB',
+    },
+    {
+      id: 'act-4',
+      title: 'Missed practice goal',
+      time: 'Yesterday',
+      type: 'missed',
+      icon: X,
+      color: '#FF5C5C',
+      bgColor: '#FFF0F0',
+    },
+  ];
+
+  // Work due soon (for toggle tab)
+  const workDue = [
+    {
+      id: 'task-1',
+      title: 'Physics Electrostatics Assignment',
+      dueLabel: 'Due today',
+      urgent: true,
+      color: '#7C4DFF',
+    },
+    {
+      id: 'task-2',
+      title: 'Chemistry Electrochemistry Homework',
+      dueLabel: 'Due tomorrow',
+      urgent: false,
+      color: '#20C997',
+    },
+    {
+      id: 'task-3',
+      title: 'Mathematics Calculus Practice Test',
+      dueLabel: 'Due Friday',
+      urgent: false,
+      color: '#4F7CFF',
+    },
+  ];
+
+  // Hexagonal badges for Achievements matching demo_screen.png
+  const achievements = [
+    { id: '1', name: 'First Steps', fill: '#F59E0B', border: '#D97706', icon: Star, locked: false },
+    { id: '2', name: '7 Day Streak', fill: '#EAB308', border: '#CA8A04', icon: Flame, locked: false },
+    { id: '3', name: 'Math Starter', fill: '#3B82F6', border: '#2563EB', icon: Award, locked: false },
+    { id: '4', name: 'Problem Solver', fill: '#F97316', border: '#EA580C', icon: Target, locked: false },
+    { id: '5', name: 'Consistent', fill: '#EAB308', border: '#CA8A04', icon: Zap, locked: false },
+    { id: '6', name: 'Subject Master', fill: '#E2E8F0', border: '#CBD5E1', icon: Lock, locked: true },
+  ];
+
   return (
-    <div className="max-w-[1360px] mx-auto space-y-8 animate-in fade-in duration-300">
-      {/* 1. GREETING & COMPACT STATS */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
-            Good morning, {studentData?.name ? studentData.name.split(' ')[0] : 'Arjun'} 👋
-          </h1>
-          <p className="text-xs sm:text-sm font-medium text-[#667085] mt-1">
-            Ready for today's learning? Small steps lead to big mastery.
-          </p>
-        </div>
-
-        {/* Streak and XP Pill */}
-        <div
-          onClick={() => navigate('/student/profile')}
-          className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-[#E6EAF0] shadow-2xs self-start sm:self-auto cursor-pointer hover:border-[#FFC800] hover:shadow-xs transition-all select-none"
-          title="View Profile & Progress"
-        >
-          <div className="flex items-center gap-1.5 text-xs font-black text-[#172033]">
-            <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-            <span>12 day streak</span>
-          </div>
-          <span className="w-1 h-1 rounded-full bg-slate-300" />
-          <div className="flex items-center gap-1.5 text-xs font-black text-[#172033]">
-            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>1,425 XP</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. ASYMMETRIC GRID: Main (8 cols) & Supporting (4 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* MAIN COLUMN (8 cols / ~67%) */}
-        <div className="lg:col-span-8 space-y-8">
-          {/* HERO CENTERPIECE: "Small Steps. Big Mastery." */}
-          <div className="relative rounded-3xl bg-gradient-to-r from-[#FFC800] via-[#FFD026] to-[#FFAE00] p-6 sm:p-10 text-[#172033] shadow-subtle overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
+    <div className="max-w-[1440px] mx-auto space-y-6 animate-in fade-in duration-300">
+      {/* 2-COLUMN ASYMMETRIC GRID: Left (Main Content, ~66%) & Right (Sidebar Widgets, ~34%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* ========================================================= */}
+        {/* LEFT COLUMN (8 cols / ~67%)                              */}
+        {/* ========================================================= */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* 1. HERO BANNER: "Small Steps. Big Mastery." */}
+          <div className="relative rounded-3xl bg-gradient-to-r from-[#FED31F] via-[#FED422] to-[#FFD934] text-[#172033] shadow-subtle overflow-hidden border border-[#E6EAF0]/40">
+            <div className="grid grid-cols-1 md:grid-cols-12 items-stretch min-h-[310px]">
               {/* Left Text & CTA */}
-              <div className="md:col-span-7 space-y-4">
-                <span className="text-xs sm:text-sm font-bold text-[#172033]/85 tracking-wide block">
-                  Small Steps. Big Mastery.
-                </span>
+              <div className="md:col-span-6 p-6 sm:p-8 lg:p-10 flex flex-col justify-between z-10">
+                <div className="space-y-3">
+                  <span className="text-xs sm:text-sm font-extrabold text-[#172033]/85 tracking-wide block">
+                    Small Steps. Big Mastery.
+                  </span>
 
-                <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-black tracking-tight leading-[1.1] text-[#172033]">
-                  Learn Today.
-                  <br />
-                  A Better You
-                  <br />
-                  Tomorrow.
-                </h2>
+                  <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight leading-[1.08] text-[#172033]">
+                    Learn Today.
+                    <br />
+                    A Better You
+                    <br />
+                    Tomorrow.
+                  </h2>
 
-                <p className="text-xs sm:text-sm font-bold text-[#172033]/80">
-                  Learn → Practice → Master → Next
-                </p>
+                  <p className="text-xs sm:text-sm font-extrabold text-[#172033]/80 pt-1">
+                    Learn → Practice → Master → Next
+                  </p>
+                </div>
 
-                <div className="pt-2">
+                <div className="pt-4">
                   <button
                     onClick={() => navigate('/student/learn/physics')}
-                    className="px-6 py-3.5 rounded-full bg-[#172033] hover:bg-slate-800 active:scale-[0.99] text-white font-black text-xs sm:text-sm inline-flex items-center gap-2.5 shadow-md transition-all cursor-pointer"
+                    className="px-7 py-3.5 rounded-full bg-[#172033] hover:bg-slate-800 active:scale-[0.98] text-white font-black text-xs sm:text-sm inline-flex items-center gap-2.5 shadow-md transition-all cursor-pointer"
                   >
                     <span>Continue Learning</span>
                     <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -180,83 +207,19 @@ export const StudentHome: React.FC = () => {
                 </div>
               </div>
 
-              {/* Right Illustration: Student with laptop & colorful book stack (Inspired by demo_screen.png) */}
-              <div className="md:col-span-5 flex items-center justify-center">
-                <div className="w-full max-w-[270px]">
-                  <svg viewBox="0 0 280 230" className="w-full h-auto select-none" fill="none">
-                    {/* Sticky Note */}
-                    <g transform="translate(180, 20) rotate(5)">
-                      <rect width="80" height="75" rx="6" fill="#FFF8DB" stroke="#E6DBA8" strokeWidth="1.5" />
-                      <text x="40" y="22" fill="#5C5538" fontSize="8.5" fontWeight="800" textAnchor="middle">Learn</text>
-                      <text x="40" y="36" fill="#5C5538" fontSize="8.5" fontWeight="800" textAnchor="middle">Practice</text>
-                      <text x="40" y="50" fill="#5C5538" fontSize="8.5" fontWeight="800" textAnchor="middle">Master</text>
-                      <text x="40" y="64" fill="#5C5538" fontSize="8.5" fontWeight="800" textAnchor="middle">Next ↺</text>
-                    </g>
-
-                    {/* Fun handwritten annotation */}
-                    <g transform="translate(60, 25) rotate(-12)">
-                      <text x="0" y="0" fill="#172033" fontSize="10" fontWeight="900" fontStyle="italic">Same Student</text>
-                      <text x="10" y="14" fill="#172033" fontSize="10" fontWeight="900" fontStyle="italic">- Higher Version ✦</text>
-                      <path d="M 60 20 Q 80 35 70 50" stroke="#172033" strokeWidth="2" fill="none" strokeLinecap="round" />
-                    </g>
-
-                    {/* Desk base line */}
-                    <rect x="20" y="188" width="250" height="10" rx="5" fill="#172033" />
-
-                    {/* Stack of colorful textbooks */}
-                    <g transform="translate(185, 115)">
-                      {/* Math */}
-                      <rect x="0" y="52" width="70" height="18" rx="4" fill="#4F7CFF" />
-                      <text x="35" y="65" fill="#FFFFFF" fontSize="9" fontWeight="900" textAnchor="middle">MATH</text>
-                      {/* Physics */}
-                      <rect x="4" y="34" width="66" height="18" rx="4" fill="#7C4DFF" />
-                      <text x="37" y="47" fill="#FFFFFF" fontSize="9" fontWeight="900" textAnchor="middle">PHYSICS</text>
-                      {/* Chemistry */}
-                      <rect x="2" y="16" width="68" height="18" rx="4" fill="#20C997" />
-                      <text x="36" y="29" fill="#FFFFFF" fontSize="8.5" fontWeight="900" textAnchor="middle">CHEMISTRY</text>
-                      {/* English */}
-                      <rect x="6" y="-2" width="62" height="18" rx="4" fill="#FF8A3D" />
-                      <text x="37" y="11" fill="#FFFFFF" fontSize="8.5" fontWeight="900" textAnchor="middle">ENGLISH</text>
-                    </g>
-
-                    {/* Student Character */}
-                    <g transform="translate(75, 55)">
-                      {/* Crown doodle */}
-                      <path d="M 35 15 L 42 22 L 50 12 L 58 22 L 65 15 L 63 26 L 37 26 Z" fill="#FFC800" stroke="#172033" strokeWidth="1.5" />
-
-                      {/* Head & Hair */}
-                      <circle cx="50" cy="50" r="22" fill="#FFDFC4" />
-                      <path d="M 28 46 C 26 28 36 18 50 18 C 64 18 74 28 72 46 C 66 38 56 36 50 36 C 44 36 34 38 28 46 Z" fill="#172033" />
-                      <path d="M 30 40 Q 36 26 50 28 Q 64 26 70 40" stroke="#172033" strokeWidth="3" strokeLinecap="round" />
-
-                      {/* Eyes & Smile */}
-                      <circle cx="43" cy="50" r="2.5" fill="#172033" />
-                      <circle cx="57" cy="50" r="2.5" fill="#172033" />
-                      <path d="M 46 58 Q 50 62 54 58" stroke="#172033" strokeWidth="2" strokeLinecap="round" fill="none" />
-
-                      {/* Hoodie Body */}
-                      <path d="M 50 72 C 30 72 18 100 18 135 L 82 135 C 82 100 70 72 50 72 Z" fill="#172033" />
-                      <path d="M 50 72 L 42 135" stroke="#24304A" strokeWidth="2.5" strokeLinecap="round" />
-                      <path d="M 50 72 L 58 135" stroke="#24304A" strokeWidth="2.5" strokeLinecap="round" />
-                    </g>
-
-                    {/* Laptop with Infinity Logo */}
-                    <g transform="translate(115, 138)">
-                      <rect x="8" y="0" width="64" height="42" rx="4" fill="#24304A" stroke="#172033" strokeWidth="2" />
-                      <rect x="11" y="3" width="58" height="36" rx="2" fill="#172033" />
-                      {/* Infinity Logo on lid */}
-                      <circle cx="36" cy="21" r="4.5" stroke="#FFC800" strokeWidth="2" fill="none" />
-                      <circle cx="44" cy="21" r="4.5" stroke="#FFC800" strokeWidth="2" fill="none" />
-                      <polygon points="0,48 80,48 72,42 8,42" fill="#98A2B3" />
-                    </g>
-                  </svg>
-                </div>
+              {/* Right Illustration: Anime Boy from demo_screen.png with laptop, books & sticky note */}
+              <div className="md:col-span-6 flex items-end justify-end relative overflow-hidden">
+                <img
+                  src="/hero_character.png"
+                  alt="Student Continuing Learning"
+                  className="w-full h-full max-h-[344px] object-contain object-right-bottom select-none pointer-events-none"
+                />
               </div>
             </div>
           </div>
 
-          {/* 3. CHOOSE A SUBJECT (4 Clean, Distinct Subject Cards) */}
-          <div className="space-y-4">
+          {/* 2. CHOOSE A SUBJECT (4 Clean, Distinct Subject Cards) */}
+          <div className="space-y-3.5">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl sm:text-2xl font-black text-[#172033] tracking-tight">
@@ -283,7 +246,7 @@ export const StudentHome: React.FC = () => {
                   <div
                     key={subj.id}
                     onClick={() => navigate(subj.path)}
-                    className="bg-white rounded-3xl border border-[#E6EAF0] p-5 hover:border-slate-300 hover:shadow-subtle hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between group"
+                    className="bg-white rounded-3xl border border-[#E6EAF0] p-5 hover:border-slate-300 hover:shadow-subtle hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between group"
                   >
                     <div className="space-y-3">
                       {/* Icon Box */}
@@ -291,7 +254,14 @@ export const StudentHome: React.FC = () => {
                         className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg transition-transform group-hover:scale-105"
                         style={{ backgroundColor: subj.bgColor, color: subj.accentColor }}
                       >
-                        <IconComponent className="w-6 h-6 stroke-[2.2]" />
+                        {subj.id === 'mathematics' ? (
+                          <div className="font-black text-sm tracking-tighter leading-none select-none text-center">
+                            + −
+                            <br />× ÷
+                          </div>
+                        ) : (
+                          <IconComponent className="w-6 h-6 stroke-[2.2]" />
+                        )}
                       </div>
 
                       {/* Title & Subtitle */}
@@ -299,7 +269,7 @@ export const StudentHome: React.FC = () => {
                         <h3 className="text-base font-black text-[#172033] group-hover:text-[#4F7CFF] transition-colors">
                           {subj.name}
                         </h3>
-                        <p className="text-xs font-semibold text-[#667085] mt-1 leading-snug line-clamp-2">
+                        <p className="text-xs font-semibold text-[#667085] mt-1 leading-snug whitespace-pre-line">
                           {subj.topics}
                         </p>
                       </div>
@@ -307,14 +277,15 @@ export const StudentHome: React.FC = () => {
                       {/* Progress Bar & Label */}
                       <div className="space-y-1.5 pt-1">
                         <div className="flex items-center justify-between text-xs font-black text-[#172033]">
-                          <span className="text-[11px] text-[#667085]">Mastery</span>
-                          <span>{subj.mastery}%</span>
-                        </div>
-                        <div className="w-full h-2 bg-[#F2F4F7] rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${subj.mastery}%`, backgroundColor: subj.accentColor }}
-                          />
+                          <div className="w-full h-2 bg-[#F2F4F7] rounded-full overflow-hidden mr-3">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{ width: `${subj.mastery}%`, backgroundColor: subj.accentColor }}
+                            />
+                          </div>
+                          <span className="text-[11px] font-bold text-[#667085] flex-shrink-0">
+                            {subj.mastery}%
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -341,7 +312,7 @@ export const StudentHome: React.FC = () => {
             </div>
           </div>
 
-          {/* 4. YOUR LEARNING JOURNEY (Interactive Loop Bar) */}
+          {/* 3. YOUR LEARNING JOURNEY (Matching demo_screen.png) */}
           <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 sm:p-7 shadow-subtle space-y-6">
             <div>
               <h3 className="text-lg font-black text-[#172033] tracking-tight">
@@ -358,7 +329,7 @@ export const StudentHome: React.FC = () => {
                 onClick={() => navigate('/student/learn')}
                 className="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-[#EFF4FF] text-[#4F7CFF] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
+                <div className="w-13 h-13 rounded-full bg-[#4F7CFF] text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
                   <BookOpen className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <span className="text-sm font-black text-[#172033]">Learn</span>
@@ -372,12 +343,12 @@ export const StudentHome: React.FC = () => {
                 onClick={() => navigate('/student/practice')}
                 className="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-[#F5F0FF] text-[#7C4DFF] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
+                <div className="w-13 h-13 rounded-full bg-[#7C4DFF] text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
                   <Target className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <span className="text-sm font-black text-[#172033]">Practice</span>
                 <span className="text-[11px] font-semibold text-[#667085] mt-0.5">
-                  Solve adaptive questions
+                  Solve questions
                 </span>
               </div>
 
@@ -386,12 +357,12 @@ export const StudentHome: React.FC = () => {
                 onClick={() => navigate('/student/profile')}
                 className="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-[#E8F9F4] text-[#20C997] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
+                <div className="w-13 h-13 rounded-full bg-[#20C997] text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
                   <Trophy className="w-6 h-6 stroke-[2.2]" />
                 </div>
                 <span className="text-sm font-black text-[#172033]">Master</span>
                 <span className="text-[11px] font-semibold text-[#667085] mt-0.5">
-                  Build confidence & XP
+                  Build confidence
                 </span>
               </div>
 
@@ -400,17 +371,17 @@ export const StudentHome: React.FC = () => {
                 onClick={() => navigate('/student/learn')}
                 className="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-[#FFF9E6] text-[#FFC800] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
-                  <FastForward className="w-6 h-6 stroke-[2.2]" />
+                <div className="w-13 h-13 rounded-full bg-[#FFC800] text-[#172033] flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform mb-2.5">
+                  <FastForward className="w-6 h-6 stroke-[2.5]" />
                 </div>
                 <span className="text-sm font-black text-[#172033]">Next</span>
                 <span className="text-[11px] font-semibold text-[#667085] mt-0.5">
-                  Unlock next chapters
+                  Unlock new topics
                 </span>
               </div>
             </div>
 
-            {/* Bottom Quote */}
+            {/* Bottom Quote matching demo_screen.png */}
             <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-100 text-xs text-[#667085] font-semibold gap-2">
               <span className="italic">"Discipline today, freedom tomorrow."</span>
               <span className="text-[#FF8A3D] font-bold">Keep Learning ♡</span>
@@ -418,9 +389,11 @@ export const StudentHome: React.FC = () => {
           </div>
         </div>
 
-        {/* SUPPORTING COLUMN (4 cols / ~33%) */}
+        {/* ========================================================= */}
+        {/* RIGHT COLUMN (4 cols / ~33%)                             */}
+        {/* ========================================================= */}
         <div className="lg:col-span-4 space-y-6">
-          {/* 1. LEARNING STREAK WIDGET (Directly from demo_screen.png) */}
+          {/* 1. LEARNING STREAK WIDGET */}
           <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 shadow-subtle space-y-5">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0 shadow-2xs">
@@ -431,7 +404,7 @@ export const StudentHome: React.FC = () => {
                   Your Learning Streak
                 </span>
                 <h3 className="text-2xl font-black text-[#172033] tracking-tight">
-                  12 days
+                  7 days
                 </h3>
                 <p className="text-xs font-semibold text-[#667085] mt-0.5">
                   Keep going! Consistency wins.
@@ -461,24 +434,23 @@ export const StudentHome: React.FC = () => {
             </div>
           </div>
 
-          {/* 2. MEET YOUR AI TUTOR (Directly from demo_screen.png) */}
+          {/* 2. MEET YOUR AI TUTOR (With cute 3D robot illustration from demo_screen.png) */}
           <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 shadow-subtle space-y-5">
             <div className="space-y-1">
               <h3 className="text-base font-black text-[#172033] tracking-tight">
                 Meet Your AI Tutor
               </h3>
-              <p className="text-xs font-medium text-[#667085]">
-                Academic guidance whenever you need it.
-              </p>
             </div>
 
-            {/* Friendly Avatar & Speech Bubble */}
+            {/* Friendly 3D Robot & Speech Bubble */}
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#F5F0FF] border border-[#E9E0FF] flex items-center justify-center flex-shrink-0 shadow-2xs">
-                <Sparkles className="w-6 h-6 text-[#7C4DFF]" />
-              </div>
+              <img
+                src="/ai_robot.png"
+                alt="AI Tutor Robot"
+                className="w-20 h-auto object-contain flex-shrink-0 select-none pointer-events-none drop-shadow-2xs"
+              />
 
-              <div className="flex-1 bg-[#F5F0FF] text-[#172033] p-3 rounded-2xl text-xs font-bold leading-snug border border-[#E9E0FF] relative">
+              <div className="flex-1 bg-[#F5F0FF] text-[#172033] p-3.5 rounded-2xl text-xs font-bold leading-snug border border-[#E9E0FF] relative">
                 Stuck on a concept? I'm here to help!
               </div>
             </div>
@@ -505,14 +477,14 @@ export const StudentHome: React.FC = () => {
                 onClick={() => navigate('/student/ai?mode=solve')}
                 className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#F7F9FC] hover:bg-[#F0F3F9] border border-[#E6EAF0] text-center transition-colors cursor-pointer"
               >
-                <span className="text-sm">⚙️</span>
+                <span className="text-xs font-mono font-bold text-[#7C4DFF]">&lt;/&gt;</span>
                 <span className="text-[10px] font-bold text-[#172033] mt-1">Solve</span>
               </button>
               <button
                 onClick={() => navigate('/student/ai?mode=quiz')}
                 className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#F7F9FC] hover:bg-[#F0F3F9] border border-[#E6EAF0] text-center transition-colors cursor-pointer"
               >
-                <span className="text-sm">📝</span>
+                <span className="text-sm">📄</span>
                 <span className="text-[10px] font-bold text-[#172033] mt-1">Quiz</span>
               </button>
               <button
@@ -520,63 +492,156 @@ export const StudentHome: React.FC = () => {
                 className="flex flex-col items-center justify-center p-2 rounded-xl bg-[#F7F9FC] hover:bg-[#F0F3F9] border border-[#E6EAF0] text-center transition-colors cursor-pointer"
               >
                 <span className="text-sm">📑</span>
-                <span className="text-[10px] font-bold text-[#172033] mt-1">Summary</span>
+                <span className="text-[10px] font-bold text-[#172033] mt-1">Summarize</span>
               </button>
             </div>
           </div>
 
-          {/* 3. WORK DUE SOON (Clean, Focused, Max 3 Items) */}
-          <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 shadow-subtle space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm sm:text-base font-black text-[#172033] tracking-tight">
-                Work due soon
-              </h3>
-              <button
-                onClick={() => navigate('/student/work')}
-                className="text-xs font-black text-[#4F7CFF] hover:underline cursor-pointer"
-              >
-                View all
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {workDue.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => navigate(`/student/work/${item.id}`)}
-                  className="p-3.5 rounded-2xl bg-[#F7F9FC] border border-[#E6EAF0] hover:bg-white hover:border-slate-300 transition-all cursor-pointer flex items-center justify-between gap-3 group"
-                >
-                  <div className="flex items-start gap-3 truncate min-w-0">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <div className="truncate min-w-0">
-                      <h4 className="text-xs sm:text-sm font-bold text-[#172033] truncate group-hover:text-[#4F7CFF] transition-colors">
-                        {item.title}
-                      </h4>
-                      <span className="text-[11px] font-semibold text-[#667085] block mt-0.5">
-                        {item.dueLabel}
-                      </span>
-                    </div>
+          {/* 3. RECENT ACTIVITY & ACHIEVEMENTS (2-Column Grid matching demo_screen.png) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Card A: Recent Activity / Work Due */}
+            <div className="bg-white rounded-3xl border border-[#E6EAF0] p-4 sm:p-5 shadow-subtle flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-center justify-between pb-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setActiveTab('activity')}
+                      className={cn(
+                        'text-sm font-black transition-colors cursor-pointer',
+                        activeTab === 'activity' ? 'text-[#172033]' : 'text-[#98A2B3] hover:text-[#172033]'
+                      )}
+                    >
+                      Recent Activity
+                    </button>
+                    <span className="text-slate-300">|</span>
+                    <button
+                      onClick={() => setActiveTab('work')}
+                      className={cn(
+                        'text-xs font-bold transition-colors cursor-pointer',
+                        activeTab === 'work' ? 'text-[#4F7CFF]' : 'text-[#98A2B3] hover:text-[#172033]'
+                      )}
+                    >
+                      Work Due
+                    </button>
                   </div>
-
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/student/work/${item.id}`);
-                    }}
-                    className={cn(
-                      'px-3.5 py-1.5 rounded-full text-xs font-black transition-all flex-shrink-0 cursor-pointer',
-                      item.urgent
-                        ? 'bg-[#FFC800] hover:bg-[#E6B400] text-[#172033]'
-                        : 'bg-white border border-slate-200 hover:bg-slate-100 text-[#172033]'
-                    )}
+                    onClick={() => navigate(activeTab === 'activity' ? '/student/profile' : '/student/work')}
+                    className="text-[11px] font-bold text-[#4F7CFF] hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
-                    Open
+                    <span>View All</span>
+                    <ChevronRight className="w-3 h-3" />
                   </button>
                 </div>
-              ))}
+
+                {/* Tab 1: Recent Activity */}
+                {activeTab === 'activity' && (
+                  <div className="space-y-2.5">
+                    {recentActivities.map((act) => {
+                      const IconComponent = act.icon;
+                      return (
+                        <div key={act.id} className="flex items-start gap-2.5">
+                          <div
+                            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                            style={{ backgroundColor: act.bgColor, color: act.color }}
+                          >
+                            <IconComponent className="w-3.5 h-3.5 stroke-[2.5]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-[#172033] leading-snug line-clamp-1">
+                              {act.title}
+                            </p>
+                            <span className="text-[10px] font-semibold text-[#98A2B3]">
+                              {act.time}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Tab 2: Work Due */}
+                {activeTab === 'work' && (
+                  <div className="space-y-2.5">
+                    {workDue.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => navigate(`/student/work/${item.id}`)}
+                        className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <p className="text-xs font-bold text-[#172033] truncate">
+                            {item.title}
+                          </p>
+                          <span className="text-[10px] font-semibold text-[#667085]">
+                            {item.dueLabel}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-[#172033] text-white flex-shrink-0">
+                          Open
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Card B: Achievements (Hexagonal Badges matching demo_screen.png) */}
+            <div className="bg-white rounded-3xl border border-[#E6EAF0] p-4 sm:p-5 shadow-subtle flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-center justify-between pb-2">
+                  <h4 className="text-sm font-black text-[#172033] tracking-tight">
+                    Achievements
+                  </h4>
+                  <button
+                    onClick={() => navigate('/student/profile')}
+                    className="text-[11px] font-bold text-[#4F7CFF] hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>View All</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {/* 3x2 Grid of Hexagonal Badges */}
+                <div className="grid grid-cols-3 gap-y-3 gap-x-1 pt-1">
+                  {achievements.map((badge) => {
+                    const IconComponent = badge.icon;
+                    return (
+                      <div
+                        key={badge.id}
+                        onClick={() => navigate('/student/profile')}
+                        className="flex flex-col items-center text-center group cursor-pointer"
+                        title={badge.name}
+                      >
+                        {/* Hexagon SVG Badge */}
+                        <div className="relative w-9 h-10 flex items-center justify-center transition-transform group-hover:scale-105">
+                          <svg viewBox="0 0 44 48" className="w-full h-full drop-shadow-2xs">
+                            <polygon
+                              points="22,2 42,12 42,36 22,46 2,36 2,12"
+                              fill={badge.locked ? '#F2F4F7' : badge.fill}
+                              stroke={badge.locked ? '#CBD5E1' : badge.border}
+                              strokeWidth="2.5"
+                            />
+                          </svg>
+                          <div
+                            className={cn(
+                              'absolute inset-0 flex items-center justify-center',
+                              badge.locked ? 'text-[#98A2B3]' : 'text-white drop-shadow-xs'
+                            )}
+                          >
+                            <IconComponent className="w-4 h-4 stroke-[2.5]" />
+                          </div>
+                        </div>
+
+                        <span className="text-[10px] font-bold text-[#172033] mt-1 leading-tight line-clamp-1 max-w-[62px]">
+                          {badge.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -584,4 +649,3 @@ export const StudentHome: React.FC = () => {
     </div>
   );
 };
-
