@@ -2,18 +2,57 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, GraduationCap, School, ShieldCheck } from 'lucide-react';
+import { cn } from '@/utils/cn';
+import { UserRole } from '@/types/domain';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const { addToast } = useUIStore();
 
+  const [selectedRole, setSelectedRole] = useState<UserRole>('student');
   const [email, setEmail] = useState('arjun.patel@iqora.edu');
   const [password, setPassword] = useState('password123');
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Handle role selection and prefill corresponding demo credentials
+  const handleRoleSelect = (role: UserRole) => {
+    setSelectedRole(role);
+    setErrorMessage('');
+    if (role === 'student') {
+      setEmail('arjun.patel@iqora.edu');
+      setPassword('password123');
+    } else if (role === 'teacher') {
+      setEmail('teacher@iqora.edu');
+      setPassword('password123');
+    } else if (role === 'admin') {
+      setEmail('admin@iqora.edu');
+      setPassword('password123');
+    }
+  };
+
+  const handleLogin = (role: UserRole) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      if (role === 'teacher') {
+        login('teacher');
+        addToast('Welcome to IQora Teacher Portal', 'success');
+        navigate('/teacher/dashboard');
+      } else if (role === 'admin') {
+        login('admin');
+        addToast('Welcome to IQora Admin Console', 'success');
+        navigate('/admin/dashboard');
+      } else {
+        login('student');
+        addToast('Welcome back to IQora, Arjun!', 'success');
+        navigate('/student/home');
+      }
+    }, 350);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,27 +63,14 @@ export const Login: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      const normalizedEmail = email.toLowerCase().trim();
-
-      // Role determined automatically from authentication credentials (no visible role toggle)
-      if (normalizedEmail.includes('teacher')) {
-        login('teacher');
-        addToast('Welcome to IQora Teacher Portal', 'success');
-        navigate('/teacher/dashboard');
-      } else if (normalizedEmail.includes('admin')) {
-        login('admin');
-        addToast('Welcome to IQora Admin Console', 'success');
-        navigate('/admin/dashboard');
-      } else {
-        login('student');
-        addToast('Welcome back to IQora, Arjun!', 'success');
-        navigate('/student/home');
-      }
-    }, 450);
+    const normalizedEmail = email.toLowerCase().trim();
+    if (normalizedEmail.includes('teacher')) {
+      handleLogin('teacher');
+    } else if (normalizedEmail.includes('admin')) {
+      handleLogin('admin');
+    } else {
+      handleLogin(selectedRole);
+    }
   };
 
   return (
@@ -135,14 +161,9 @@ export const Login: React.FC = () => {
               </g>
 
               {/* Floating Academic Shapes */}
-              {/* Physics Orbit */}
               <ellipse cx="70" cy="50" rx="24" ry="10" transform="rotate(-25 70 50)" stroke="#7C4DFF" strokeWidth="2" strokeDasharray="3 3" fill="none" />
               <circle cx="85" cy="43" r="3" fill="#7C4DFF" />
-
-              {/* Math Function wave */}
               <path d="M290 55 Q305 35 320 55 T350 55" stroke="#4F7CFF" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-              {/* Chemistry Benzene Ring */}
               <polygon points="310,120 322,113 334,120 334,134 322,141 310,134" stroke="#20C997" strokeWidth="2" fill="none" />
               <circle cx="322" cy="127" r="4.5" stroke="#20C997" strokeWidth="1.5" fill="none" />
             </svg>
@@ -174,8 +195,58 @@ export const Login: React.FC = () => {
               Welcome back
             </h1>
             <p className="text-sm font-medium text-[#667085]">
-              Continue where you left off.
+              Choose a demo role to enter the platform.
             </p>
+          </div>
+
+          {/* Role Quick Selector (Student / Teacher / Admin) */}
+          <div className="space-y-2">
+            <label className="text-xs font-black text-[#172033] uppercase tracking-wider block">
+              Select Demo Role
+            </label>
+            <div className="grid grid-cols-3 gap-2 bg-[#F7F9FC] p-1.5 rounded-2xl border border-[#E6EAF0]">
+              <button
+                type="button"
+                onClick={() => handleRoleSelect('student')}
+                className={cn(
+                  'flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all cursor-pointer select-none',
+                  selectedRole === 'student'
+                    ? 'bg-white text-[#172033] shadow-xs border border-[#E6EAF0]'
+                    : 'text-[#667085] hover:text-[#172033] hover:bg-white/50'
+                )}
+              >
+                <GraduationCap className={cn('w-4 h-4', selectedRole === 'student' ? 'text-[#FFC800]' : 'text-[#667085]')} />
+                <span>Student</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleSelect('teacher')}
+                className={cn(
+                  'flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all cursor-pointer select-none',
+                  selectedRole === 'teacher'
+                    ? 'bg-white text-[#172033] shadow-xs border border-[#E6EAF0]'
+                    : 'text-[#667085] hover:text-[#172033] hover:bg-white/50'
+                )}
+              >
+                <School className={cn('w-4 h-4', selectedRole === 'teacher' ? 'text-[#7C4DFF]' : 'text-[#667085]')} />
+                <span>Teacher</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleSelect('admin')}
+                className={cn(
+                  'flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all cursor-pointer select-none',
+                  selectedRole === 'admin'
+                    ? 'bg-white text-[#172033] shadow-xs border border-[#E6EAF0]'
+                    : 'text-[#667085] hover:text-[#172033] hover:bg-white/50'
+                )}
+              >
+                <ShieldCheck className={cn('w-4 h-4', selectedRole === 'admin' ? 'text-[#20C997]' : 'text-[#667085]')} />
+                <span>Admin</span>
+              </button>
+            </div>
           </div>
 
           {/* Form */}
@@ -205,7 +276,7 @@ export const Login: React.FC = () => {
                   href="#forgot"
                   onClick={(e) => {
                     e.preventDefault();
-                    addToast('Password reset link sent to your registered email.', 'info');
+                    addToast('Demo account password is prefilled (password123)', 'info');
                   }}
                   className="text-xs font-bold text-[#4F7CFF] hover:underline"
                 >
@@ -252,63 +323,55 @@ export const Login: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-[#172033]" />
-                  <span>Signing in...</span>
+                  <span>Entering portal...</span>
                 </>
               ) : (
                 <>
-                  <span>Sign in</span>
+                  <span>
+                    Sign in as {selectedRole === 'student' ? 'Student' : selectedRole === 'teacher' ? 'Teacher' : 'Admin'}
+                  </span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Social Auth Option (Secondary) */}
-          <div className="space-y-3 pt-2">
-            <div className="relative flex items-center justify-center">
-              <div className="border-t border-slate-200 w-full" />
-              <span className="bg-white px-3 text-[11px] font-bold text-[#667085] uppercase tracking-wider absolute">
-                or
-              </span>
+          {/* Quick Demo Launch Buttons */}
+          <div className="pt-2 border-t border-[#E6EAF0] space-y-2">
+            <span className="text-[11px] font-black uppercase tracking-wider text-[#667085] block text-center">
+              Instant Demo Access
+            </span>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => handleLogin('student')}
+                className="py-2 px-2.5 rounded-xl bg-[#F7F9FC] hover:bg-white hover:border-[#FFC800] border border-[#E6EAF0] text-xs font-bold text-[#172033] transition-all text-center shadow-2xs cursor-pointer"
+              >
+                Launch Student
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLogin('teacher')}
+                className="py-2 px-2.5 rounded-xl bg-[#F7F9FC] hover:bg-white hover:border-[#7C4DFF] border border-[#E6EAF0] text-xs font-bold text-[#172033] transition-all text-center shadow-2xs cursor-pointer"
+              >
+                Launch Teacher
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLogin('admin')}
+                className="py-2 px-2.5 rounded-xl bg-[#F7F9FC] hover:bg-white hover:border-[#20C997] border border-[#E6EAF0] text-xs font-bold text-[#172033] transition-all text-center shadow-2xs cursor-pointer"
+              >
+                Launch Admin
+              </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                login('student');
-                addToast('Signed in with Google as Arjun', 'success');
-                navigate('/student/home');
-              }}
-              className="w-full h-12 rounded-xl border border-[#E6EAF0] bg-white hover:bg-slate-50 text-xs sm:text-sm font-bold text-[#172033] flex items-center justify-center gap-2.5 transition-colors shadow-2xs cursor-pointer"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                />
-              </svg>
-              <span>Continue with Google</span>
-            </button>
           </div>
 
           {/* Registration Footnote */}
           <div className="text-center pt-2">
             <p className="text-xs text-[#667085] font-medium">
-              Don't have an account?{' '}
+              Need assistance?{' '}
               <Link to="/register" className="font-bold text-[#172033] hover:underline">
-                Register now
+                View platform guide
               </Link>
             </p>
           </div>
