@@ -1,39 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { getAllSubjects } from '@/data/curriculum';
+import { demoTasks } from '@/demo/demoData';
 import {
   ArrowRight,
   Flame,
-  Star,
   BookOpen,
   Target,
   Trophy,
   FastForward,
   Check,
-  X,
   Atom,
   FlaskConical,
   BookMarked,
   Calculator,
-  Award,
-  Zap,
-  Lock,
   ChevronRight,
+  HelpCircle,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export const StudentHome: React.FC = () => {
   const navigate = useNavigate();
-  const { studentData } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'activity' | 'work'>('activity');
 
-  // 4 Subjects matching demo_screen.png aesthetic
+  // Dynamically load mastery from curriculum so percentages in Home & Learn always match 100%
+  const curriculumSubjects = getAllSubjects();
+  const getSubjectMastery = (id: string, fallback: number) => {
+    const s = curriculumSubjects.find((subj) => subj.id === id);
+    return s ? s.overallMastery : fallback;
+  };
+
+  // 4 Subjects matching demo_screen.png aesthetic & Learn page mastery %
   const subjects = [
     {
       id: 'mathematics',
       name: 'Math',
       topics: 'Algebra • Calculus\nGeometry • More',
-      mastery: 68,
+      mastery: getSubjectMastery('mathematics', 78),
       accentColor: '#4F7CFF',
       bgColor: '#EFF4FF',
       btnColor: 'bg-[#4F7CFF] hover:bg-[#3D6CE6] text-white',
@@ -45,7 +47,7 @@ export const StudentHome: React.FC = () => {
       id: 'physics',
       name: 'Physics',
       topics: 'Mechanics • Thermodynamics\nElectromagnetism • More',
-      mastery: 42,
+      mastery: getSubjectMastery('physics', 72),
       accentColor: '#7C4DFF',
       bgColor: '#F5F0FF',
       btnColor: 'bg-[#7C4DFF] hover:bg-[#6C3AE8] text-white',
@@ -57,7 +59,7 @@ export const StudentHome: React.FC = () => {
       id: 'chemistry',
       name: 'Chemistry',
       topics: 'Organic • Inorganic\nPhysical • More',
-      mastery: 35,
+      mastery: getSubjectMastery('chemistry', 64),
       accentColor: '#20C997',
       bgColor: '#E8F9F4',
       btnColor: 'bg-[#20C997] hover:bg-[#1BAF83] text-white',
@@ -69,7 +71,7 @@ export const StudentHome: React.FC = () => {
       id: 'english',
       name: 'English',
       topics: 'Grammar • Vocabulary\nComprehension • More',
-      mastery: 58,
+      mastery: getSubjectMastery('english', 81),
       accentColor: '#FF8A3D',
       bgColor: '#FFF3EB',
       btnColor: 'bg-[#FF8A3D] hover:bg-[#E87528] text-white',
@@ -90,13 +92,13 @@ export const StudentHome: React.FC = () => {
     { day: 'Sun', completed: false },
   ];
 
-  // Recent Activity matching demo_screen.png
+  // Recent Activity matching actual student actions
   const recentActivities = [
     {
       id: 'act-1',
       title: 'Solved 10 Math questions',
       time: '2 hours ago',
-      type: 'success',
+      path: '/student/practice/mathematics',
       icon: Check,
       color: '#20C997',
       bgColor: '#E8F9F4',
@@ -105,7 +107,7 @@ export const StudentHome: React.FC = () => {
       id: 'act-2',
       title: "Learned: Newton's Laws",
       time: '5 hours ago',
-      type: 'learn',
+      path: '/student/learn/physics',
       icon: BookOpen,
       color: '#7C4DFF',
       bgColor: '#F5F0FF',
@@ -114,56 +116,41 @@ export const StudentHome: React.FC = () => {
       id: 'act-3',
       title: 'Completed English Vocabulary Set 1',
       time: 'Yesterday',
-      type: 'learn',
+      path: '/student/learn/english',
       icon: BookMarked,
       color: '#FF8A3D',
       bgColor: '#FFF3EB',
     },
     {
       id: 'act-4',
-      title: 'Missed practice goal',
+      title: 'Asked AI Tutor: Redox Balancing',
       time: 'Yesterday',
-      type: 'missed',
-      icon: X,
-      color: '#FF5C5C',
-      bgColor: '#FFF0F0',
-    },
-  ];
-
-  // Work due soon (for toggle tab)
-  const workDue = [
-    {
-      id: 'task-1',
-      title: 'Physics Electrostatics Assignment',
-      dueLabel: 'Due today',
-      urgent: true,
-      color: '#7C4DFF',
-    },
-    {
-      id: 'task-2',
-      title: 'Chemistry Electrochemistry Homework',
-      dueLabel: 'Due tomorrow',
-      urgent: false,
-      color: '#20C997',
-    },
-    {
-      id: 'task-3',
-      title: 'Mathematics Calculus Practice Test',
-      dueLabel: 'Due Friday',
-      urgent: false,
+      path: '/student/ai?mode=explain',
+      icon: HelpCircle,
       color: '#4F7CFF',
+      bgColor: '#EFF4FF',
     },
   ];
 
-  // Hexagonal badges for Achievements matching demo_screen.png
-  const achievements = [
-    { id: '1', name: 'First Steps', fill: '#F59E0B', border: '#D97706', icon: Star, locked: false },
-    { id: '2', name: '7 Day Streak', fill: '#EAB308', border: '#CA8A04', icon: Flame, locked: false },
-    { id: '3', name: 'Math Starter', fill: '#3B82F6', border: '#2563EB', icon: Award, locked: false },
-    { id: '4', name: 'Problem Solver', fill: '#F97316', border: '#EA580C', icon: Target, locked: false },
-    { id: '5', name: 'Consistent', fill: '#EAB308', border: '#CA8A04', icon: Zap, locked: false },
-    { id: '6', name: 'Subject Master', fill: '#E2E8F0', border: '#CBD5E1', icon: Lock, locked: true },
-  ];
+  // Work due soon (Real functional assignments linking to /student/work/:id)
+  const upcomingTasks = demoTasks.slice(0, 3).map((task) => ({
+    id: task.id,
+    title: task.title,
+    subject: task.subjectName,
+    dueLabel:
+      task.id === 'task-1'
+        ? 'Due today'
+        : task.id === 'task-2'
+        ? 'Due tomorrow'
+        : 'Due Friday',
+    urgent: task.id === 'task-1',
+    color:
+      task.subjectId === 'physics'
+        ? '#7C4DFF'
+        : task.subjectId === 'chemistry'
+        ? '#20C997'
+        : '#4F7CFF',
+  }));
 
   return (
     <div className="max-w-[1440px] mx-auto space-y-6 animate-in fade-in duration-300">
@@ -497,105 +484,17 @@ export const StudentHome: React.FC = () => {
             </div>
           </div>
 
-          {/* 3. RECENT ACTIVITY & ACHIEVEMENTS (2-Column Grid matching demo_screen.png) */}
+          {/* 3. RECENT ACTIVITY & WORK DUE (2-Column Grid matching demo_screen.png aesthetic) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Card A: Recent Activity / Work Due */}
-            <div className="bg-white rounded-3xl border border-[#E6EAF0] p-4 sm:p-5 shadow-subtle flex flex-col justify-between space-y-4">
-              <div>
-                <div className="flex items-center justify-between pb-2">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setActiveTab('activity')}
-                      className={cn(
-                        'text-sm font-black transition-colors cursor-pointer',
-                        activeTab === 'activity' ? 'text-[#172033]' : 'text-[#98A2B3] hover:text-[#172033]'
-                      )}
-                    >
-                      Recent Activity
-                    </button>
-                    <span className="text-slate-300">|</span>
-                    <button
-                      onClick={() => setActiveTab('work')}
-                      className={cn(
-                        'text-xs font-bold transition-colors cursor-pointer',
-                        activeTab === 'work' ? 'text-[#4F7CFF]' : 'text-[#98A2B3] hover:text-[#172033]'
-                      )}
-                    >
-                      Work Due
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => navigate(activeTab === 'activity' ? '/student/profile' : '/student/work')}
-                    className="text-[11px] font-bold text-[#4F7CFF] hover:underline flex items-center gap-0.5 cursor-pointer"
-                  >
-                    <span>View All</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </button>
-                </div>
-
-                {/* Tab 1: Recent Activity */}
-                {activeTab === 'activity' && (
-                  <div className="space-y-2.5">
-                    {recentActivities.map((act) => {
-                      const IconComponent = act.icon;
-                      return (
-                        <div key={act.id} className="flex items-start gap-2.5">
-                          <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                            style={{ backgroundColor: act.bgColor, color: act.color }}
-                          >
-                            <IconComponent className="w-3.5 h-3.5 stroke-[2.5]" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-[#172033] leading-snug line-clamp-1">
-                              {act.title}
-                            </p>
-                            <span className="text-[10px] font-semibold text-[#98A2B3]">
-                              {act.time}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Tab 2: Work Due */}
-                {activeTab === 'work' && (
-                  <div className="space-y-2.5">
-                    {workDue.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => navigate(`/student/work/${item.id}`)}
-                        className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
-                      >
-                        <div className="min-w-0 pr-2">
-                          <p className="text-xs font-bold text-[#172033] truncate">
-                            {item.title}
-                          </p>
-                          <span className="text-[10px] font-semibold text-[#667085]">
-                            {item.dueLabel}
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-[#172033] text-white flex-shrink-0">
-                          Open
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Card B: Achievements (Hexagonal Badges matching demo_screen.png) */}
+            {/* Card A: Recent Activity (View All redirects to /student/work) */}
             <div className="bg-white rounded-3xl border border-[#E6EAF0] p-4 sm:p-5 shadow-subtle flex flex-col justify-between space-y-4">
               <div>
                 <div className="flex items-center justify-between pb-2">
                   <h4 className="text-sm font-black text-[#172033] tracking-tight">
-                    Achievements
+                    Recent Activity
                   </h4>
                   <button
-                    onClick={() => navigate('/student/profile')}
+                    onClick={() => navigate('/student/work')}
                     className="text-[11px] font-bold text-[#4F7CFF] hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
                     <span>View All</span>
@@ -603,43 +502,90 @@ export const StudentHome: React.FC = () => {
                   </button>
                 </div>
 
-                {/* 3x2 Grid of Hexagonal Badges */}
-                <div className="grid grid-cols-3 gap-y-3 gap-x-1 pt-1">
-                  {achievements.map((badge) => {
-                    const IconComponent = badge.icon;
+                <div className="space-y-2.5">
+                  {recentActivities.map((act) => {
+                    const IconComponent = act.icon;
                     return (
                       <div
-                        key={badge.id}
-                        onClick={() => navigate('/student/profile')}
-                        className="flex flex-col items-center text-center group cursor-pointer"
-                        title={badge.name}
+                        key={act.id}
+                        onClick={() => navigate(act.path)}
+                        className="flex items-start gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group"
                       >
-                        {/* Hexagon SVG Badge */}
-                        <div className="relative w-9 h-10 flex items-center justify-center transition-transform group-hover:scale-105">
-                          <svg viewBox="0 0 44 48" className="w-full h-full drop-shadow-2xs">
-                            <polygon
-                              points="22,2 42,12 42,36 22,46 2,36 2,12"
-                              fill={badge.locked ? '#F2F4F7' : badge.fill}
-                              stroke={badge.locked ? '#CBD5E1' : badge.border}
-                              strokeWidth="2.5"
-                            />
-                          </svg>
-                          <div
-                            className={cn(
-                              'absolute inset-0 flex items-center justify-center',
-                              badge.locked ? 'text-[#98A2B3]' : 'text-white drop-shadow-xs'
-                            )}
-                          >
-                            <IconComponent className="w-4 h-4 stroke-[2.5]" />
-                          </div>
+                        <div
+                          className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                          style={{ backgroundColor: act.bgColor, color: act.color }}
+                        >
+                          <IconComponent className="w-3.5 h-3.5 stroke-[2.5]" />
                         </div>
-
-                        <span className="text-[10px] font-bold text-[#172033] mt-1 leading-tight line-clamp-1 max-w-[62px]">
-                          {badge.name}
-                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-[#172033] group-hover:text-[#4F7CFF] transition-colors leading-snug line-clamp-1">
+                            {act.title}
+                          </p>
+                          <span className="text-[10px] font-semibold text-[#98A2B3]">
+                            {act.time}
+                          </span>
+                        </div>
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            </div>
+
+            {/* Card B: Work Due Soon (Replacing Achievements with fully functional work widget) */}
+            <div className="bg-white rounded-3xl border border-[#E6EAF0] p-4 sm:p-5 shadow-subtle flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-center justify-between pb-2">
+                  <h4 className="text-sm font-black text-[#172033] tracking-tight">
+                    Work Due Soon
+                  </h4>
+                  <button
+                    onClick={() => navigate('/student/work')}
+                    className="text-[11px] font-bold text-[#4F7CFF] hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>View All</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                <div className="space-y-2.5">
+                  {upcomingTasks.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => navigate(`/student/work/${item.id}`)}
+                      className="p-2.5 rounded-2xl bg-[#F7F9FC] border border-[#E6EAF0] hover:bg-white hover:border-slate-300 transition-all cursor-pointer flex items-center justify-between gap-2 group"
+                    >
+                      <div className="flex items-start gap-2 min-w-0 flex-1">
+                        <span
+                          className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-[#172033] group-hover:text-[#4F7CFF] transition-colors truncate">
+                            {item.title}
+                          </p>
+                          <span className="text-[10px] font-semibold text-[#667085] block mt-0.5">
+                            {item.dueLabel}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/student/work/${item.id}`);
+                        }}
+                        className={cn(
+                          'px-3 py-1 rounded-full text-[10px] font-black transition-all flex-shrink-0 cursor-pointer shadow-2xs',
+                          item.urgent
+                            ? 'bg-[#FFC800] hover:bg-[#E6B400] text-[#172033]'
+                            : 'bg-white border border-slate-200 hover:bg-slate-100 text-[#172033]'
+                        )}
+                      >
+                        Open
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
