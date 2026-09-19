@@ -15,9 +15,6 @@ import { cn } from '@/utils/cn';
 export const WorkView: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'today' | 'upcoming' | 'completed'>('today');
-  const [activeTaskModal, setActiveTaskModal] = useState<Task | null>(null);
-  const [submissionText, setSubmissionText] = useState<string>('');
-  const [submittedTasks, setSubmittedTasks] = useState<Record<string, boolean>>({});
 
   const filteredTasks = mockTasks.filter((task) => {
     if (activeTab === 'today') {
@@ -25,7 +22,7 @@ export const WorkView: React.FC = () => {
     } else if (activeTab === 'upcoming') {
       return task.status !== 'submitted' && task.status !== 'evaluated' && task.dueDate !== '2026-09-19';
     } else if (activeTab === 'completed') {
-      return task.status === 'evaluated' || task.status === 'submitted' || submittedTasks[task.id];
+      return task.status === 'evaluated' || task.status === 'submitted';
     }
     return true;
   });
@@ -40,21 +37,15 @@ export const WorkView: React.FC = () => {
     }
   };
 
-  const handleSubmit = (taskId: string) => {
-    setSubmittedTasks((prev) => ({ ...prev, [taskId]: true }));
-    setActiveTaskModal(null);
-    setSubmissionText('');
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
-          Work
+          Work & Assignments
         </h1>
         <p className="text-xs sm:text-sm font-medium text-[#667085] mt-1">
-          Your academic inbox for assignments, homework, and tests.
+          Your academic workspace for assignments, homework, and lab submissions.
         </p>
       </div>
 
@@ -98,17 +89,18 @@ export const WorkView: React.FC = () => {
           </div>
         ) : (
           filteredTasks.map((task) => {
-            const isSubmitted = submittedTasks[task.id] || task.status === 'submitted';
+            const isSubmitted = task.status === 'submitted' || task.status === 'evaluated';
             const color = getSubjectColor(task.subjectId);
 
             return (
               <div
                 key={task.id}
-                className="bg-white rounded-2xl sm:rounded-3xl border border-[#E6EAF0] p-5 sm:p-6 hover:border-[#D0D5DD] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                onClick={() => navigate(`/student/work/${task.id}`)}
+                className="bg-white rounded-2xl sm:rounded-3xl border border-[#E6EAF0] p-5 sm:p-6 hover:border-[#D0D5DD] hover:shadow-subtle cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
               >
                 <div className="flex items-start gap-3.5">
                   <span
-                    className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
+                    className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0"
                     style={{ backgroundColor: color }}
                   />
                   <div>
@@ -120,9 +112,14 @@ export const WorkView: React.FC = () => {
                       <span className="text-xs font-semibold text-[#667085]">
                         Due: {task.dueDate}
                       </span>
+                      {task.status === 'in_progress' && (
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                          In Progress
+                        </span>
+                      )}
                     </div>
 
-                    <h3 className="text-base font-black text-[#172033] mt-0.5">
+                    <h3 className="text-base font-black text-[#172033] mt-0.5 group-hover:text-[#4F7CFF] transition-colors">
                       {task.title}
                     </h3>
                   </div>
@@ -134,15 +131,18 @@ export const WorkView: React.FC = () => {
                   </span>
 
                   <button
-                    onClick={() => setActiveTaskModal(task)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/student/work/${task.id}`);
+                    }}
                     className={cn(
-                      'px-5 py-2 rounded-full text-xs font-black transition-all flex items-center gap-1.5 shadow-xs',
+                      'px-5 py-2.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 shadow-xs',
                       isSubmitted
-                        ? 'bg-slate-100 text-slate-500 cursor-default'
+                        ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                         : 'bg-[#FFC800] hover:bg-[#E6B400] text-[#172033]'
                     )}
                   >
-                    <span>{isSubmitted ? 'Submitted' : 'Start & Submit'}</span>
+                    <span>{isSubmitted ? 'View Submission' : 'Submit Work'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -151,64 +151,6 @@ export const WorkView: React.FC = () => {
           })
         )}
       </div>
-
-      {/* Task Submission Modal */}
-      {activeTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-elevated border border-[#E6EAF0]">
-            <div className="flex items-start justify-between">
-              <div>
-                <span className="text-xs font-black uppercase text-[#7C4DFF]">
-                  {activeTaskModal.subjectName}
-                </span>
-                <h3 className="text-lg font-black text-[#172033] mt-1">
-                  {activeTaskModal.title}
-                </h3>
-                <span className="text-xs text-[#667085]">
-                  Due: {activeTaskModal.dueDate} • {activeTaskModal.maxMarks} Marks
-                </span>
-              </div>
-              <button
-                onClick={() => setActiveTaskModal(null)}
-                className="text-xs font-bold text-slate-400 hover:text-slate-600"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-[#F7F9FC] text-xs text-slate-700 leading-relaxed">
-              <strong>Instructions: </strong>
-              {activeTaskModal.instructions}
-            </div>
-
-            <textarea
-              rows={5}
-              value={submissionText}
-              onChange={(e) => setSubmissionText(e.target.value)}
-              placeholder="Type your response or worked solution here..."
-              className="w-full text-xs sm:text-sm font-mono p-4 rounded-2xl border border-[#E6EAF0] focus:outline-none focus:border-[#FFC800] focus:ring-2 focus:ring-[#FFC800]/20"
-            />
-
-            <div className="flex items-center justify-between pt-2">
-              <button
-                onClick={() => navigate('/student/lesson/phys-ch2-l3')}
-                className="text-xs font-bold text-[#4F7CFF] hover:underline"
-              >
-                Learn Concept First
-              </button>
-
-              <button
-                onClick={() => handleSubmit(activeTaskModal.id)}
-                disabled={!submissionText.trim()}
-                className="px-6 py-2.5 rounded-full text-xs font-black bg-[#172033] hover:bg-slate-800 text-white disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5 shadow-xs transition-all"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Submit Work</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

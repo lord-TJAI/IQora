@@ -239,7 +239,7 @@ export const StudentHome: React.FC = () => {
             {upcomingWork.map((task) => (
               <div
                 key={task.id}
-                onClick={() => navigate('/student/work')}
+                onClick={() => navigate(`/student/work/${task.id}`)}
                 className="p-3.5 rounded-2xl bg-[#F7F9FC] border border-[#E6EAF0] hover:bg-white hover:border-[#D0D5DD] transition-all cursor-pointer flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3">
