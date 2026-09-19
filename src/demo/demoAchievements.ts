@@ -1,0 +1,68 @@
+import { Achievement } from '@/types/domain';
+
+export const demoAchievements: Achievement[] = [
+  {
+    id: 'ach-1',
+    title: 'First Mastery',
+    description: 'Master your first CBSE Chapter with 80%+ score',
+    icon: 'Trophy',
+    unlocked: true,
+    unlockedAt: '2026-08-28',
+    progress: 100,
+    category: 'mastery',
+    xpBonus: 100,
+  },
+  {
+    id: 'ach-2',
+    title: '7 Day Streak',
+    description: 'Learn every day for 7 consecutive days',
+    icon: 'Flame',
+    unlocked: true,
+    unlockedAt: '2026-09-08',
+    progress: 100,
+    category: 'streak',
+    xpBonus: 150,
+  },
+  {
+    id: 'ach-3',
+    title: 'Physics Explorer',
+    description: 'Complete 10 visual physics simulations',
+    icon: 'Atom',
+    unlocked: true,
+    unlockedAt: '2026-09-14',
+    progress: 100,
+    category: 'practice',
+    xpBonus: 120,
+  },
+  {
+    id: 'ach-4',
+    title: '100 Questions',
+    description: 'Answer 100 adaptive questions correctly',
+    icon: 'CheckCircle2',
+    unlocked: true,
+    unlockedAt: '2026-09-17',
+    progress: 100,
+    category: 'practice',
+    xpBonus: 200,
+  },
+  {
+    id: 'ach-5',
+    title: '30 Day Streak',
+    description: 'Maintain consistency for a full month',
+    icon: 'Zap',
+    unlocked: false,
+    progress: 40, // 12 / 30
+    category: 'streak',
+    xpBonus: 350,
+  },
+  {
+    id: 'ach-6',
+    title: 'Chemistry Challenger',
+    description: 'Complete 10 reaction kinetics simulations',
+    icon: 'FlaskConical',
+    unlocked: false,
+    progress: 70, // 7 / 10
+    category: 'practice',
+    xpBonus: 150,
+  },
+];
