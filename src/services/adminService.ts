@@ -1,4 +1,4 @@
-import { Student, Teacher } from '@/types/domain';
+import { Student, Teacher, Subject } from '@/types/domain';
 import { mockClass12AStudents, mockTeacherUser, mockSubjects } from './mock/mockData';
 import { apiClient } from './api/client';
 
