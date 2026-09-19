@@ -26,6 +26,7 @@ import { VoiceAi } from '@/features/student/VoiceAi';
 import { CameraScan } from '@/features/student/CameraScan';
 import { MasteryMap } from '@/features/student/MasteryMap';
 import { NextBestActionView } from '@/features/student/NextBestAction';
+import { WorkView } from '@/features/student/WorkView';
 import { TasksList } from '@/features/student/TasksList';
 import { TaskDetail } from '@/features/student/TaskDetail';
 import { TestStart } from '@/features/student/TestStart';
@@ -99,7 +100,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="mastery" element={<MasteryMap />} />
         <Route path="mastery/:subjectId" element={<MasteryMap />} />
         <Route path="next-best-action" element={<NextBestActionView />} />
-        <Route path="tasks" element={<TasksList />} />
+        <Route path="work" element={<WorkView />} />
+        <Route path="work/:taskId" element={<TaskDetail />} />
+        <Route path="tasks" element={<Navigate to="/student/work" replace />} />
         <Route path="tasks/:taskId" element={<TaskDetail />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="achievements" element={<AchievementsView />} />

@@ -4,6 +4,7 @@ import {
   Home,
   BookOpen,
   Target,
+  Briefcase,
   Sparkles,
   User,
   Search,
@@ -25,8 +26,8 @@ export const StudentLayout: React.FC = () => {
     { to: '/student/home', label: 'Home', icon: Home },
     { to: '/student/learn', label: 'Learn', icon: BookOpen },
     { to: '/student/practice', label: 'Practice', icon: Target },
+    { to: '/student/work', label: 'Work', icon: Briefcase },
     { to: '/student/ai', label: 'AI', icon: Sparkles },
-    { to: '/student/profile', label: 'Profile', icon: User },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
