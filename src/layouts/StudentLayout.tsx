@@ -115,77 +115,21 @@ export const StudentLayout: React.FC = () => {
             </button>
 
             {/* User Profile Avatar with dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none"
-              >
-                <img
-                  src={
-                    studentData?.avatarUrl ||
-                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-                  }
-                  alt={studentData?.name || 'Arjun'}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs"
-                />
-              </button>
-
-              {profileMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setProfileMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-[#E6EAF0] shadow-elevated p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="px-3 py-2.5 border-b border-[#E6EAF0]">
-                      <p className="text-sm font-bold text-[#172033] truncate">
-                        {studentData?.name || 'Arjun Patel'}
-                      </p>
-                      <p className="text-xs text-[#667085] truncate">
-                        {studentData?.className || 'Class 12-A'}
-                      </p>
-                    </div>
-
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          setProfileMenuOpen(false);
-                          navigate('/student/profile');
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#172033] hover:bg-[#F7F9FC] rounded-xl transition-colors"
-                      >
-                        <User className="w-4 h-4 text-[#667085]" />
-                        <span>My Profile & Stats</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setProfileMenuOpen(false);
-                          navigate('/student/mastery');
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#172033] hover:bg-[#F7F9FC] rounded-xl transition-colors"
-                      >
-                        <Target className="w-4 h-4 text-[#667085]" />
-                        <span>Mastery Map</span>
-                      </button>
-                    </div>
-
-                    <div className="pt-1 border-t border-[#E6EAF0]">
-                      <button
-                        onClick={() => {
-                          setProfileMenuOpen(false);
-                          logout();
-                          navigate('/login');
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#FF5C5C] hover:bg-rose-50 rounded-xl transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign out</span>
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+            {/* User Profile Avatar */}
+            <button
+              onClick={() => navigate('/student/profile')}
+              className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none group"
+              title="Profile & Progress"
+            >
+              <img
+                src={
+                  studentData?.avatarUrl ||
+                  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+                }
+                alt={studentData?.name || 'Arjun'}
+                className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform"
+              />
+            </button>
           </div>
         </div>
       </header>

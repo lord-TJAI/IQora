@@ -91,7 +91,11 @@ export const StudentHome: React.FC = () => {
         </div>
 
         {/* Minimal Stats Pill */}
-        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-[#E6EAF0] shadow-xs self-start sm:self-auto">
+        <div
+          onClick={() => navigate('/student/profile')}
+          className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-[#E6EAF0] shadow-xs self-start sm:self-auto cursor-pointer hover:border-[#FFC800] hover:shadow-subtle transition-all"
+          title="View Profile & Progress"
+        >
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#172033]">
             <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
             <span>{studentData?.streakDays || 12} day streak</span>
@@ -99,7 +103,11 @@ export const StudentHome: React.FC = () => {
           <span className="w-1 h-1 rounded-full bg-slate-300" />
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#172033]">
             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>{studentData?.xp || 1425} XP</span>
+            <span>{studentData?.xp || 1240} XP</span>
+          </div>
+          <span className="w-1 h-1 rounded-full bg-slate-300" />
+          <div className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200/60">
+            35 / 60 XP today
           </div>
         </div>
       </div>
