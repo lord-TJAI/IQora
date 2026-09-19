@@ -1,6 +1,7 @@
 import React from 'react';
 import { StudentProgression } from '@/types/progression';
 import { Sparkles, Flame, Award, Zap, Bell, Settings, Target } from 'lucide-react';
+import { Avatar } from '@/components/ui/Avatar';
 import { cn } from '@/utils/cn';
 
 interface ProfileHeaderProps {
@@ -22,10 +23,12 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {/* Avatar + Identity */}
         <div className="flex items-center gap-4 sm:gap-5">
           <div className="relative">
-            <img
-              src={progression.avatarUrl}
-              alt={progression.name}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-4 ring-[#FFC800]/30 shadow-xs"
+            <Avatar
+              seed={progression.name}
+              name={progression.name}
+              role="student"
+              size={76}
+              className="ring-4 ring-[#FFC800]/30 shadow-xs"
             />
             <div className="absolute -bottom-1 -right-1 bg-[#172033] text-white px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase border-2 border-white shadow-xs">
               Lvl {progression.level}

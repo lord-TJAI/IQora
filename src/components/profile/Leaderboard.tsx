@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { LeaderboardEntry } from '@/types/progression';
 import { Trophy, TrendingUp, TrendingDown, Minus, Sparkles, Users } from 'lucide-react';
+import { Avatar } from '@/components/ui/Avatar';
 import { cn } from '@/utils/cn';
 
 interface LeaderboardProps {
