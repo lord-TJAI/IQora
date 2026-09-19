@@ -188,17 +188,6 @@ export const StudentLayout: React.FC = () => {
                       <button
                         onClick={() => {
                           setProfileMenuOpen(false);
-                          setIsAskTeacherOpen(true);
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-purple-700 hover:bg-purple-50 transition-colors text-left"
-                      >
-                        <MessageSquare className="w-4 h-4 text-purple-600" />
-                        <span>Ask Teacher a Doubt</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setProfileMenuOpen(false);
                           navigate('/student/notifications');
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#172033] hover:bg-slate-50 transition-colors text-left"

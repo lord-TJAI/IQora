@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { mockTasks } from '@/services/mock/mockData';
 import { useUIStore } from '@/stores/uiStore';
-import { AskTeacherModal } from '@/components/query/AskTeacherModal';
 import {
   ArrowLeft,
   Calendar,
@@ -17,11 +16,11 @@ import {
   AlertCircle,
   BookOpen,
   Target,
-  MessageSquare,
   FileSpreadsheet,
   Image as ImageIcon,
   FileCheck,
   X,
+  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -86,9 +85,6 @@ export const TaskDetail: React.FC = () => {
   const [newLinkTitle, setNewLinkTitle] = useState('');
   const [showAddLink, setShowAddLink] = useState(false);
 
-  // "Ask your teacher" modal
-  const [isAskTeacherOpen, setIsAskTeacherOpen] = useState(false);
-
   // Supported extensions
   const ALLOWED_EXTENSIONS = [
     '.pdf',
@@ -103,13 +99,21 @@ export const TaskDetail: React.FC = () => {
     '.webp',
   ];
 
-  const getFileIcon = (fileName: string) => {
+  const getFileBadge = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
-    if (ext === 'pdf') return FileText;
-    if (ext === 'ppt' || ext === 'pptx') return FileSpreadsheet;
-    if (ext === 'doc' || ext === 'docx') return FileText;
-    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext || '')) return ImageIcon;
-    return FileCheck;
+    if (ext === 'pdf') {
+      return { icon: FileText, label: 'PDF', bg: 'bg-rose-50 text-rose-700 border-rose-200' };
+    }
+    if (ext === 'ppt' || ext === 'pptx') {
+      return { icon: FileSpreadsheet, label: 'PPT', bg: 'bg-amber-50 text-amber-700 border-amber-200' };
+    }
+    if (ext === 'doc' || ext === 'docx') {
+      return { icon: FileText, label: 'DOC', bg: 'bg-blue-50 text-blue-700 border-blue-200' };
+    }
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext || '')) {
+      return { icon: ImageIcon, label: ext?.toUpperCase() || 'IMG', bg: 'bg-purple-50 text-purple-700 border-purple-200' };
+    }
+    return { icon: FileCheck, label: ext?.toUpperCase() || 'TXT', bg: 'bg-slate-100 text-slate-700 border-slate-200' };
   };
 
   const handleFileUpload = (uploadedFiles: FileList | null) => {
@@ -193,15 +197,9 @@ export const TaskDetail: React.FC = () => {
           <span>Back to Work Inbox</span>
         </button>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsAskTeacherOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-[#7C4DFF] transition-colors shadow-xs"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Ask teacher</span>
-          </button>
-        </div>
+        <span className="text-xs font-bold text-[#667085]">
+          Due: <strong className="text-[#172033]">{task.dueDate}</strong>
+        </span>
       </div>
 
       {/* 2-Column Desktop Grid / 1-Column Mobile Layout */}
@@ -311,7 +309,7 @@ export const TaskDetail: React.FC = () => {
                     e.preventDefault();
                     handleFileUpload(e.dataTransfer.files);
                   }}
-                  className="border-2 border-dashed border-slate-300 hover:border-[#FFC800] bg-[#FAFBFD] hover:bg-amber-50/20 rounded-2xl p-6 text-center cursor-pointer transition-all space-y-2 group"
+                  className="border-2 border-dashed border-slate-300 hover:border-[#FFC800] bg-[#FAFBFD] hover:bg-amber-50/20 rounded-3xl p-6 sm:p-8 text-center cursor-pointer transition-all space-y-3 group"
                 >
                   <input
                     ref={fileInputRef}
@@ -322,54 +320,73 @@ export const TaskDetail: React.FC = () => {
                     onChange={(e) => handleFileUpload(e.target.files)}
                   />
 
-                  <div className="w-12 h-12 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center mx-auto group-hover:scale-105 transition-transform text-[#667085] group-hover:text-amber-500">
-                    <UploadCloud className="w-6 h-6" />
+                  <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center mx-auto group-hover:scale-105 transition-transform text-[#667085] group-hover:text-amber-500">
+                    <UploadCloud className="w-7 h-7" />
                   </div>
 
                   <div>
-                    <p className="text-xs sm:text-sm font-bold text-[#172033]">
-                      Drag and drop files here, or <span className="text-[#4F7CFF] underline">choose files</span>
+                    <p className="text-sm font-black text-[#172033]">
+                      Drag & drop files here, or <span className="text-[#4F7CFF] underline font-bold">browse device</span>
                     </p>
-                    <p className="text-[11px] text-[#667085] mt-0.5">
-                      Accepted: PDF, PPT, PPTX, DOC, DOCX, TXT, JPG, PNG, WEBP (Max 25 MB per file)
+                    <p className="text-xs text-[#667085] mt-1">
+                      Max file size: 25 MB per file
                     </p>
+                  </div>
+
+                  {/* Format Badges */}
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                    <span className="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold">PDF</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-bold">DOC / DOCX</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold">PPT / PPTX</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 text-[10px] font-bold">Images (JPG, PNG, WEBP)</span>
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold">TXT</span>
                   </div>
                 </div>
 
                 {/* Attached Files List */}
                 {files.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-[#172033] block">
-                      Attached Files ({files.length})
-                    </span>
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-[#172033]">
+                        Attached Files ({files.length})
+                      </span>
+                      <span className="text-[11px] text-[#667085]">
+                        All files within 25 MB limit
+                      </span>
+                    </div>
+
                     <div className="space-y-2">
                       {files.map((file) => {
-                        const Icon = getFileIcon(file.name);
+                        const badge = getFileBadge(file.name);
+                        const Icon = badge.icon;
                         return (
                           <div
                             key={file.id}
-                            className="p-3 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs"
+                            className="p-3.5 rounded-2xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs shadow-xs hover:border-slate-300 transition-colors"
                           >
-                            <div className="flex items-center gap-3 truncate">
-                              <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 flex-shrink-0">
+                            <div className="flex items-center gap-3 truncate min-w-0">
+                              <div className={cn('w-9 h-9 rounded-xl border flex items-center justify-center flex-shrink-0 font-bold', badge.bg)}>
                                 <Icon className="w-4 h-4" />
                               </div>
-                              <div className="truncate">
+                              <div className="truncate min-w-0">
                                 <span className="font-bold text-[#172033] block truncate">
                                   {file.name}
                                 </span>
-                                <span className="text-[10px] text-[#667085]">
-                                  {file.size} • {file.status}
-                                </span>
+                                <div className="flex items-center gap-2 text-[10px] text-[#667085] mt-0.5">
+                                  <span>{file.size}</span>
+                                  <span>•</span>
+                                  <span className="text-emerald-600 font-bold">✓ Ready for submission</span>
+                                </div>
                               </div>
                             </div>
 
                             <button
                               type="button"
                               onClick={() => setFiles(files.filter((f) => f.id !== file.id))}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                              title="Remove file"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         );
@@ -379,16 +396,16 @@ export const TaskDetail: React.FC = () => {
                 )}
 
                 {/* Attached Links List & Link Adder */}
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#172033]">
+                    <span className="text-xs font-black text-[#172033]">
                       External Links ({links.length})
                     </span>
                     {!showAddLink && (
                       <button
                         type="button"
                         onClick={() => setShowAddLink(true)}
-                        className="text-[11px] font-bold text-[#4F7CFF] hover:underline flex items-center gap-1"
+                        className="text-xs font-bold text-[#4F7CFF] hover:underline flex items-center gap-1"
                       >
                         <Link2 className="w-3.5 h-3.5" />
                         <span>Add Link</span>
@@ -397,35 +414,45 @@ export const TaskDetail: React.FC = () => {
                   </div>
 
                   {showAddLink && (
-                    <form onSubmit={handleAddLink} className="p-3.5 rounded-2xl border border-slate-200 bg-[#FAFBFD] space-y-2 text-xs">
-                      <input
-                        type="text"
-                        placeholder="Link title (e.g. Google Drive Presentation)"
-                        value={newLinkTitle}
-                        onChange={(e) => setNewLinkTitle(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#4F7CFF]"
-                      />
-                      <input
-                        type="url"
-                        required
-                        placeholder="https://..."
-                        value={newLinkUrl}
-                        onChange={(e) => setNewLinkUrl(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#4F7CFF]"
-                      />
+                    <form onSubmit={handleAddLink} className="p-4 rounded-2xl border border-blue-200 bg-blue-50/30 space-y-3 text-xs">
+                      <div>
+                        <label className="text-[11px] font-bold text-[#172033] block mb-1">
+                          Link Title (e.g. Google Drive Lab Video, Figma Wireframe, GitHub Repo)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Google Drive Lab Video Demonstration"
+                          value={newLinkTitle}
+                          onChange={(e) => setNewLinkTitle(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-[#4F7CFF]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-[#172033] block mb-1">
+                          Web URL
+                        </label>
+                        <input
+                          type="url"
+                          required
+                          placeholder="https://drive.google.com/..."
+                          value={newLinkUrl}
+                          onChange={(e) => setNewLinkUrl(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 focus:outline-none focus:border-[#4F7CFF]"
+                        />
+                      </div>
                       <div className="flex justify-end gap-2 pt-1">
                         <button
                           type="button"
                           onClick={() => setShowAddLink(false)}
-                          className="px-3 py-1.5 rounded-lg border text-[#667085]"
+                          className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-[#667085]"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-1.5 rounded-lg bg-[#172033] text-white font-bold"
+                          className="px-4 py-1.5 rounded-xl bg-[#172033] text-white text-xs font-black"
                         >
-                          Add Link
+                          Attach Link
                         </button>
                       </div>
                     </form>
@@ -436,11 +463,13 @@ export const TaskDetail: React.FC = () => {
                       {links.map((link) => (
                         <div
                           key={link.id}
-                          className="p-3 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs"
+                          className="p-3.5 rounded-2xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs shadow-xs hover:border-slate-300 transition-colors"
                         >
-                          <div className="flex items-center gap-2.5 truncate">
-                            <Link2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                            <div className="truncate">
+                          <div className="flex items-center gap-2.5 truncate min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                              <ExternalLink className="w-4 h-4" />
+                            </div>
+                            <div className="truncate min-w-0">
                               <span className="font-bold text-[#172033] block truncate">
                                 {link.title}
                               </span>
@@ -458,9 +487,10 @@ export const TaskDetail: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setLinks(links.filter((l) => l.id !== link.id))}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                            title="Remove link"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       ))}
@@ -570,19 +600,6 @@ export const TaskDetail: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* "Ask Your Teacher" Modal */}
-      <AskTeacherModal
-        isOpen={isAskTeacherOpen}
-        onClose={() => setIsAskTeacherOpen(false)}
-        context={{
-          subjectId: 'physics',
-          subjectName: 'Physics',
-          chapterId: 'phys-ch2',
-          chapterTitle: 'Electrostatic Potential and Capacitance',
-          contextSource: 'assignment',
-        }}
-      />
     </div>
   );
 };

@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getStudentProgression } from '@/services/progression/progressionService';
 import { useAuthStore } from '@/stores/authStore';
+import { StreakHeatmap } from '@/components/profile/StreakHeatmap';
+import { Leaderboard } from '@/components/profile/Leaderboard';
 import {
   Zap,
   Flame,
@@ -13,10 +15,8 @@ import {
   FlaskConical,
   ArrowRight,
   LogOut,
-  CheckCircle2,
   Calendar,
   Sparkles,
-  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -26,16 +26,6 @@ const subjectIcons: Record<string, any> = {
   chemistry: FlaskConical,
   english: BookOpen,
 };
-
-const weekDays = [
-  { label: 'M', full: 'Mon', active: true },
-  { label: 'T', full: 'Tue', active: true },
-  { label: 'W', full: 'Wed', active: true },
-  { label: 'T', full: 'Thu', active: true },
-  { label: 'F', full: 'Fri', active: true },
-  { label: 'S', full: 'Sat', active: false },
-  { label: 'S', full: 'Sun', active: false },
-];
 
 export const StudentProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -47,12 +37,8 @@ export const StudentProfile: React.FC = () => {
     navigate('/login');
   };
 
-  const unlockedAchievements = progression.achievements
-    .filter((a) => a.unlocked)
-    .slice(0, 3);
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
       {/* 1. Clean Identity & Header */}
       <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 sm:p-8 shadow-subtle space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -238,7 +224,7 @@ export const StudentProfile: React.FC = () => {
                     className="font-bold text-xs text-[#172033] hover:text-[#7C4DFF] flex items-center gap-1 transition-colors"
                   >
                     <span>Study</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -247,101 +233,26 @@ export const StudentProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Weekly Streak & Learning Cadence */}
-      <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 shadow-subtle space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h3 className="text-base font-black text-[#172033]">
-              This Week's Learning Cadence
-            </h3>
-            <p className="text-xs text-[#667085]">
-              Active {progression.thisWeekActiveDays} of 7 days • Best streak: {progression.longestStreak} days
-            </p>
-          </div>
+      {/* 3. GitHub-style Streak Heatmap */}
+      <StreakHeatmap
+        currentStreak={progression.currentStreak}
+        longestStreak={progression.longestStreak}
+        thisWeekActiveDays={progression.thisWeekActiveDays}
+        nextMilestone={progression.nextStreakMilestone}
+        nextMilestoneRewardXp={progression.streakMilestoneRewardXp}
+        daysToNextMilestone={progression.daysToNextMilestone}
+        milestones={progression.milestones}
+        heatmap={progression.heatmap}
+      />
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-orange-600 flex items-center gap-1 bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
-              <Flame className="w-3.5 h-3.5 fill-orange-500" />
-              {progression.currentStreak}-Day Streak Active
-            </span>
-          </div>
-        </div>
-
-        {/* 7-Day Strip */}
-        <div className="grid grid-cols-7 gap-2 pt-2">
-          {weekDays.map((day, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                'p-3 rounded-2xl text-center border transition-all',
-                day.active
-                  ? 'bg-amber-50/80 border-amber-300 text-[#172033]'
-                  : 'bg-slate-50 border-slate-200 text-[#98A2B3]'
-              )}
-            >
-              <span className="text-[10px] font-bold block uppercase tracking-wider mb-1">
-                {day.full}
-              </span>
-              <div className="w-6 h-6 rounded-full mx-auto flex items-center justify-center">
-                {day.active ? (
-                  <CheckCircle2 className="w-5 h-5 text-amber-600 fill-amber-100" />
-                ) : (
-                  <div className="w-2 h-2 rounded-full bg-slate-300" />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 4. Key Unlocked Achievements */}
-      {unlockedAchievements.length > 0 && (
-        <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 shadow-subtle space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-black text-[#172033]">
-                Recent Achievements
-              </h3>
-              <p className="text-xs text-[#667085]">
-                Milestones unlocked through verified learning progress
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/student/achievements')}
-              className="text-xs font-bold text-[#7C4DFF] hover:underline flex items-center gap-1"
-            >
-              <span>View all ({progression.achievements.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {unlockedAchievements.map((ach) => (
-              <div
-                key={ach.id}
-                className="p-4 rounded-2xl bg-[#FAFBFD] border border-slate-200 space-y-2 flex flex-col justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#FFC800]/20 flex items-center justify-center text-lg">
-                    {ach.icon}
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-[#172033]">
-                      {ach.title}
-                    </h4>
-                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.2 rounded-full border border-amber-200">
-                      +{ach.xpBonus} XP
-                    </span>
-                  </div>
-                </div>
-                <p className="text-[11px] text-[#667085] leading-snug">
-                  {ach.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* 4. Peer Leaderboard */}
+      <Leaderboard
+        userRank={progression.leaderboard.userRank}
+        userWeeklyXp={progression.leaderboard.userWeeklyXp}
+        podium={progression.leaderboard.podium}
+        nearbyRanks={progression.leaderboard.nearbyRanks}
+        encouragingMessage={progression.leaderboard.encouragingMessage}
+      />
 
       {/* 5. Account & Session Details */}
       <div className="p-6 rounded-3xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
