@@ -3,6 +3,7 @@ import { adminService } from '@/services/adminService';
 import { Teacher } from '@/types/domain';
 import { Table, Column } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
+import { Avatar } from '@/components/ui/Avatar';
 import { useUIStore } from '@/stores/uiStore';
 import { UserPlus, School, BookOpen } from 'lucide-react';
 
@@ -20,10 +21,11 @@ export const AdminTeachers: React.FC = () => {
       header: 'Faculty Member',
       render: (t) => (
         <div className="flex items-center gap-3">
-          <img
-            src={t.avatarUrl}
-            alt={t.name}
-            className="w-9 h-9 rounded-full object-cover"
+          <Avatar
+            seed={t.name}
+            name={t.name}
+            role="teacher"
+            size={36}
           />
           <div>
             <span className="font-bold text-brand-text-primary block">{t.name}</span>

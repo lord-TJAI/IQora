@@ -4,6 +4,7 @@ import { mockClass12AStudents, mockSubjects } from '@/services/mock/mockData';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { MasteryBar } from '@/components/learning/MasteryBar';
+import { Avatar } from '@/components/ui/Avatar';
 import { ArrowLeft, User, CalendarCheck, Award, AlertTriangle, MessageSquare } from 'lucide-react';
 
 export const TeacherStudentProfile: React.FC = () => {
@@ -14,7 +15,7 @@ export const TeacherStudentProfile: React.FC = () => {
     mockClass12AStudents.find((s) => s.id === studentId) || mockClass12AStudents[0];
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-200">
+    <div className="space-y-6 max-w-5xl mx-auto animate-in fade-in duration-200">
       <button
         onClick={() => navigate('/teacher/students')}
         className="inline-flex items-center gap-2 text-xs font-bold text-brand-text-secondary hover:text-brand-text-primary"
@@ -25,10 +26,12 @@ export const TeacherStudentProfile: React.FC = () => {
 
       {/* Student Overview Header */}
       <Card className="p-6 sm:p-8 border border-brand-border bg-white flex flex-col sm:flex-row items-center sm:items-start gap-6 shadow-subtle">
-        <img
-          src={student.avatarUrl}
-          alt={student.name}
-          className="w-20 h-20 rounded-full object-cover ring-4 ring-slate-100"
+        <Avatar
+          seed={student.name}
+          name={student.name}
+          role="student"
+          size={80}
+          className="ring-4 ring-slate-100 shadow-xs"
         />
 
         <div className="flex-1 space-y-2 text-center sm:text-left">
