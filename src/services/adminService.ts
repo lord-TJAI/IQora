@@ -88,7 +88,7 @@ export const adminService = {
     return apiClient<Teacher[]>('/admin/teachers');
   },
 
-  async getClasses() {
+  async getClasses(): Promise<any[]> {
     if (USE_MOCKS) {
       await delay(200);
       return [
@@ -97,15 +97,15 @@ export const adminService = {
         { id: '12-C', name: 'Class 12-C', stream: 'Commerce', studentsCount: 44, classTeacher: 'Mrs. Dsouza', room: 'Room 304' },
       ];
     }
-    return apiClient('/admin/classes');
+    return apiClient<any[]>('/admin/classes');
   },
 
-  async getSubjects() {
+  async getSubjects(): Promise<Subject[]> {
     if (USE_MOCKS) {
       await delay(200);
       return [...mockSubjects];
     }
-    return apiClient('/admin/subjects');
+    return apiClient<Subject[]>('/admin/subjects');
   },
 
   async getAcademicYear() {
