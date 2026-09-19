@@ -1,5 +1,7 @@
 import { Student, Teacher, Subject } from '@/types/domain';
-import { mockClass12AStudents, mockTeacherUser, mockSubjects } from './mock/mockData';
+import { mockSubjects } from './mock/mockData';
+import { demoTeachersList, demoStudentsList, DEMO_INSTITUTION } from '@/demo/demoData';
+import { demoClasses } from '@/demo/demoClasses';
 import { apiClient } from './api/client';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false';
@@ -23,19 +25,19 @@ export const adminService = {
     if (USE_MOCKS) {
       await delay(250);
       return {
-        totalStudents: 342,
-        totalTeachers: 28,
-        totalClasses: 8,
+        totalStudents: DEMO_INSTITUTION.totalStudents, // 160
+        totalTeachers: DEMO_INSTITUTION.totalTeachers, // 12
+        totalClasses: DEMO_INSTITUTION.totalClasses, // 8
         activeSubjects: 4,
-        overallAttendance: 93,
-        avgAcademicPerformance: 76,
-        activeTasks: 24,
-        completedTests: 68,
+        overallAttendance: DEMO_INSTITUTION.averageAttendance, // 93%
+        avgAcademicPerformance: DEMO_INSTITUTION.averageMastery, // 74%
+        activeTasks: 18,
+        completedTests: 42,
         classesData: [
-          { name: 'Class 12-A (Sci)', students: 42, avgMastery: 78, attendance: 94 },
-          { name: 'Class 12-B (Sci)', students: 39, avgMastery: 74, attendance: 92 },
-          { name: 'Class 12-C (Com)', students: 44, avgMastery: 76, attendance: 95 },
-          { name: 'Class 12-D (Hum)', students: 38, avgMastery: 81, attendance: 91 },
+          { name: 'Class 12-A', students: 40, avgMastery: 74, attendance: 94 },
+          { name: 'Class 12-B', students: 38, avgMastery: 71, attendance: 92 },
+          { name: 'Class 12-C', students: 42, avgMastery: 76, attendance: 95 },
+          { name: 'Class 11-A', students: 40, avgMastery: 69, attendance: 91 },
         ],
         subjectPerformance: [
           { subject: 'Mathematics', score: 78, color: '#4F7CFF' },
@@ -51,7 +53,7 @@ export const adminService = {
   async getStudents(): Promise<Student[]> {
     if (USE_MOCKS) {
       await delay(200);
-      return [...mockClass12AStudents];
+      return [...demoStudentsList];
     }
     return apiClient<Student[]>('/admin/students');
   },
@@ -59,31 +61,7 @@ export const adminService = {
   async getTeachers(): Promise<Teacher[]> {
     if (USE_MOCKS) {
       await delay(200);
-      return [
-        mockTeacherUser,
-        {
-          id: 'teacher-2',
-          name: 'Dr. Rajesh Kapoor',
-          title: 'Dr. Kapoor',
-          email: 'rajesh.kapoor@iqora.edu',
-          role: 'teacher',
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-          subjects: ['chemistry'],
-          classIds: ['12-A', '12-C'],
-          totalStudents: 86,
-        },
-        {
-          id: 'teacher-3',
-          name: 'Mr. Amit Verma',
-          title: 'Mr. Verma',
-          email: 'amit.verma@iqora.edu',
-          role: 'teacher',
-          avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
-          subjects: ['mathematics'],
-          classIds: ['12-A', '12-B'],
-          totalStudents: 81,
-        },
-      ];
+      return [...demoTeachersList];
     }
     return apiClient<Teacher[]>('/admin/teachers');
   },
@@ -91,8 +69,10 @@ export const adminService = {
   async getClasses(): Promise<any[]> {
     if (USE_MOCKS) {
       await delay(200);
-      return [
-        { id: '12-A', name: 'Class 12-A', stream: 'Science', studentsCount: 42, classTeacher: 'Ms. Ananya Sharma', room: 'Room 301' },
+      return [...demoClasses];
+    }
+    return apiClient<any[]>('/admin/classes');
+  },
         { id: '12-B', name: 'Class 12-B', stream: 'Science', studentsCount: 39, classTeacher: 'Mr. Amit Verma', room: 'Room 302' },
         { id: '12-C', name: 'Class 12-C', stream: 'Commerce', studentsCount: 44, classTeacher: 'Mrs. Dsouza', room: 'Room 304' },
       ];

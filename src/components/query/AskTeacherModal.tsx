@@ -58,8 +58,6 @@ export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
     const newQuery = submitStudentQuery({
       studentId: 'student-1',
       studentName: 'Arjun Sharma',
-      studentAvatar:
-        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       className: 'Class 12-A',
       subjectId: selectedSubject,
       subjectName,
@@ -75,7 +73,7 @@ export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
               id: 'att-1',
               name: 'handwritten_working.jpg',
               type: 'image',
-              url: 'https://images.unsplash.com/photo-1588072432836-e10032774350?w=600',
+              url: '#',
               sizeBytes: 1024 * 450,
             },
           ]

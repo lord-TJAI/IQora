@@ -12,7 +12,7 @@ export const Login: React.FC = () => {
   const { addToast } = useUIStore();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
-  const [email, setEmail] = useState('arjun.patel@iqora.edu');
+  const [email, setEmail] = useState('student@iqora.demo');
   const [password, setPassword] = useState('password123');
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,13 +23,13 @@ export const Login: React.FC = () => {
     setSelectedRole(role);
     setErrorMessage('');
     if (role === 'student') {
-      setEmail('arjun.patel@iqora.edu');
+      setEmail('student@iqora.demo');
       setPassword('password123');
     } else if (role === 'teacher') {
-      setEmail('teacher@iqora.edu');
+      setEmail('teacher@iqora.demo');
       setPassword('password123');
     } else if (role === 'admin') {
-      setEmail('admin@iqora.edu');
+      setEmail('admin@iqora.demo');
       setPassword('password123');
     }
   };
