@@ -23,6 +23,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { ClassSelector } from '@/components/teacher/ClassSelector';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+import { Avatar } from '@/components/ui/Avatar';
 import { cn } from '@/utils/cn';
 
 export const TeacherLayout: React.FC = () => {
@@ -144,14 +145,15 @@ export const TeacherLayout: React.FC = () => {
         <div className="p-3 border-t border-brand-border">
           {!sidebarCollapsed && teacherData && (
             <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 mb-2">
-              <img
-                src={teacherData.avatarUrl}
-                alt={teacherData.name}
-                className="w-8 h-8 rounded-full object-cover"
+              <Avatar
+                seed={teacherData.name || 'Mr. Rohan Mehta'}
+                name={teacherData.name || 'Mr. Rohan Mehta'}
+                role="teacher"
+                size={34}
               />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold text-brand-text-primary truncate">
-                  {teacherData.title}
+                  {teacherData.title || teacherData.name}
                 </p>
                 <p className="text-[10px] text-brand-text-secondary truncate">
                   Physics Dept • Class 12

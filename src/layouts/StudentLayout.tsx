@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import { AskTeacherModal } from '@/components/query/AskTeacherModal';
+import { Avatar } from '@/components/ui/Avatar';
 import { cn } from '@/utils/cn';
 
 export const StudentLayout: React.FC = () => {
@@ -131,16 +132,14 @@ export const StudentLayout: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none group"
+                className="flex items-center gap-2 p-0.5 rounded-2xl hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none cursor-pointer"
                 title="Account & Profile"
               >
-                <img
-                  src={
-                    studentData?.avatarUrl ||
-                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-                  }
-                  alt={studentData?.name || 'Arjun'}
-                  className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform"
+                <Avatar
+                  seed={studentData?.name || 'Arjun Sharma'}
+                  name={studentData?.name || 'Arjun Sharma'}
+                  role="student"
+                  size={36}
                 />
               </button>
 
@@ -154,13 +153,11 @@ export const StudentLayout: React.FC = () => {
                   <div className="absolute right-0 top-12 mt-2 w-64 rounded-2xl bg-white border border-[#E6EAF0] shadow-elevated p-2 z-50 animate-in fade-in zoom-in-95">
                     <div className="p-3 bg-[#FAFBFD] rounded-xl border border-slate-100 mb-1">
                       <div className="flex items-center gap-2.5">
-                        <img
-                          src={
-                            studentData?.avatarUrl ||
-                            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-                          }
-                          alt={studentData?.name || 'Arjun'}
-                          className="w-9 h-9 rounded-full object-cover border border-white shadow-xs"
+                        <Avatar
+                          seed={studentData?.name || 'Arjun Sharma'}
+                          name={studentData?.name || 'Arjun Sharma'}
+                          role="student"
+                          size={40}
                         />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-black text-[#172033] truncate">

@@ -726,8 +726,7 @@ export const mockSubmissions: Submission[] = [
     taskType: 'assignment',
     subjectId: 'physics',
     studentId: 'student-1',
-    studentName: 'Arjun Patel',
-    studentAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    studentName: 'Arjun Sharma',
     submittedAt: '2026-09-19T10:15:00Z',
     status: 'pending',
     maxMarks: 25,
@@ -752,6 +751,7 @@ export const mockSubmissions: Submission[] = [
       },
     ],
     overallAiSummary: 'Student demonstrated sound theoretical foundation. All steps verified with correct sign conventions.',
+    teacherFeedback: 'Your method is correct, but make sure to explain why the potential difference becomes zero on an equipotential surface when writing the board exam derivation.',
   },
   {
     id: 'sub-2',
@@ -760,11 +760,11 @@ export const mockSubmissions: Submission[] = [
     taskType: 'assignment',
     subjectId: 'physics',
     studentId: 'student-3',
-    studentName: 'Rohan Gupta',
-    studentAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    studentName: 'Priya Nair',
     submittedAt: '2026-09-19T09:40:00Z',
-    status: 'pending',
+    status: 'evaluated',
     maxMarks: 25,
+    score: 24,
     answers: [
       {
         questionId: 'q-sub-1',
