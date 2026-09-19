@@ -10,9 +10,11 @@ import {
   Search,
   Bell,
   LogOut,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+import { AskTeacherModal } from '@/components/query/AskTeacherModal';
 import { cn } from '@/utils/cn';
 
 export const StudentLayout: React.FC = () => {
@@ -21,6 +23,7 @@ export const StudentLayout: React.FC = () => {
   const { studentData, logout } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [isAskTeacherOpen, setIsAskTeacherOpen] = useState(false);
 
   const navItems = [
     { to: '/student/home', label: 'Home', icon: Home },
@@ -104,6 +107,16 @@ export const StudentLayout: React.FC = () => {
               />
             </form>
 
+            {/* Ask Teacher (General Doubt System) */}
+            <button
+              onClick={() => setIsAskTeacherOpen(true)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold transition-colors"
+              title="Ask your teacher a doubt"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Ask Teacher</span>
+            </button>
+
             {/* Notification Bell */}
             <button
               onClick={() => navigate('/student/notifications')}
@@ -115,21 +128,103 @@ export const StudentLayout: React.FC = () => {
             </button>
 
             {/* User Profile Avatar with dropdown */}
-            {/* User Profile Avatar */}
-            <button
-              onClick={() => navigate('/student/profile')}
-              className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none group"
-              title="Profile & Progress"
-            >
-              <img
-                src={
-                  studentData?.avatarUrl ||
-                  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-                }
-                alt={studentData?.name || 'Arjun'}
-                className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform"
-              />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none group"
+                title="Account & Profile"
+              >
+                <img
+                  src={
+                    studentData?.avatarUrl ||
+                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+                  }
+                  alt={studentData?.name || 'Arjun'}
+                  className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs group-hover:scale-105 transition-transform"
+                />
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {profileMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 top-12 mt-2 w-64 rounded-2xl bg-white border border-[#E6EAF0] shadow-elevated p-2 z-50 animate-in fade-in zoom-in-95">
+                    <div className="p-3 bg-[#FAFBFD] rounded-xl border border-slate-100 mb-1">
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={
+                            studentData?.avatarUrl ||
+                            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+                          }
+                          alt={studentData?.name || 'Arjun'}
+                          className="w-9 h-9 rounded-full object-cover border border-white shadow-xs"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-black text-[#172033] truncate">
+                            {studentData?.name || 'Arjun Sharma'}
+                          </p>
+                          <p className="text-[10px] font-bold text-[#667085] truncate">
+                            Class 12-A • PCM + English
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-0.5">
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          navigate('/student/profile');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#172033] hover:bg-slate-50 transition-colors text-left"
+                      >
+                        <User className="w-4 h-4 text-[#667085]" />
+                        <span>Profile & Progress</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          setIsAskTeacherOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-purple-700 hover:bg-purple-50 transition-colors text-left"
+                      >
+                        <MessageSquare className="w-4 h-4 text-purple-600" />
+                        <span>Ask Teacher a Doubt</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          navigate('/student/notifications');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-[#172033] hover:bg-slate-50 transition-colors text-left"
+                      >
+                        <Bell className="w-4 h-4 text-[#667085]" />
+                        <span>Notifications</span>
+                      </button>
+                    </div>
+
+                    <div className="border-t border-slate-100 my-1" />
+
+                    <button
+                      onClick={() => {
+                        setProfileMenuOpen(false);
+                        logout();
+                        navigate('/login');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -177,6 +272,12 @@ export const StudentLayout: React.FC = () => {
           })}
         </div>
       </nav>
+
+      {/* General Ask Teacher Doubt Modal */}
+      <AskTeacherModal
+        isOpen={isAskTeacherOpen}
+        onClose={() => setIsAskTeacherOpen(false)}
+      />
 
       {/* Global Toast Container */}
       <ToastContainer />

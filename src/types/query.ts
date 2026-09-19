@@ -21,7 +21,7 @@ export interface StudentQuery {
   topicId?: string;
   conceptId?: string;
   conceptName?: string;
-  contextSource: 'lesson' | 'practice' | 'assignment' | 'ai';
+  contextSource: 'lesson' | 'practice' | 'assignment' | 'ai' | 'general';
   message: string;
   attachments?: QueryAttachment[];
   createdAt: string;

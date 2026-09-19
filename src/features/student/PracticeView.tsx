@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { SubjectId, PracticeQuestion } from '@/types/curriculum';
 import { getAllSubjects, getSubjectCurriculum, getTopicPractice } from '@/data/curriculum';
 import { useAuthStore } from '@/stores/authStore';
-import { AskTeacherModal } from '@/components/query/AskTeacherModal';
 import {
   ArrowLeft,
   Sparkles,
@@ -38,9 +37,6 @@ export const PracticeView: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectId | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<{ id: string; name: string; mastery: number } | null>(null);
   const [selectedMode, setSelectedMode] = useState<PracticeMode>('quick');
-
-  // "Ask your teacher" modal state
-  const [isAskTeacherOpen, setIsAskTeacherOpen] = useState(false);
 
   // Active Session State
   const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
@@ -527,15 +523,6 @@ export const PracticeView: React.FC = () => {
                     <HelpCircle className="w-3.5 h-3.5 text-[#7C4DFF]" />
                     <span>{currentQuestion.conceptName}</span>
                   </div>
-
-                  {/* Context-Aware Ask Teacher Button */}
-                  <button
-                    onClick={() => setIsAskTeacherOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7C4DFF] hover:underline"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Ask your teacher</span>
-                  </button>
                 </div>
 
                 {/* Prompt */}
@@ -630,13 +617,6 @@ export const PracticeView: React.FC = () => {
                       <span className={cn('text-xs font-black uppercase', isCurrentCorrect ? 'text-emerald-700' : 'text-amber-700')}>
                         {isCurrentCorrect ? '✓ Correct Solution' : 'Diagnostic Feedback'}
                       </span>
-                      <button
-                        onClick={() => setIsAskTeacherOpen(true)}
-                        className="text-[11px] font-bold text-[#7C4DFF] hover:underline flex items-center gap-1"
-                      >
-                        <MessageSquare className="w-3 h-3" />
-                        Still confused? Ask teacher
-                      </button>
                     </div>
 
                     <p className="text-xs sm:text-sm text-[#172033] leading-relaxed">
@@ -740,23 +720,6 @@ export const PracticeView: React.FC = () => {
             </div>
           )}
         </div>
-      )}
-
-      {/* "Ask Your Teacher" Modal */}
-      {selectedSubject && (
-        <AskTeacherModal
-          isOpen={isAskTeacherOpen}
-          onClose={() => setIsAskTeacherOpen(false)}
-          context={{
-            subjectId: selectedSubject,
-            subjectName: selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1),
-            chapterId: selectedTopic?.id || 'chapter-1',
-            chapterTitle: selectedTopic?.name || 'Class 12 Chapter',
-            conceptId: currentQuestion?.conceptId,
-            conceptName: currentQuestion?.conceptName,
-            contextSource: 'practice',
-          }}
-        />
       )}
     </div>
   );

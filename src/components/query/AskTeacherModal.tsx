@@ -4,20 +4,29 @@ import { StudentQuery } from '@/types/query';
 import { MessageSquare, Paperclip, Send, X, CheckCircle2, User, BookOpen } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
+export interface QueryModalContext {
+  subjectId?: 'mathematics' | 'physics' | 'chemistry' | 'english';
+  subjectName?: string;
+  chapterId?: string;
+  chapterTitle?: string;
+  conceptId?: string;
+  conceptName?: string;
+  contextSource?: 'lesson' | 'practice' | 'assignment' | 'ai' | 'general';
+}
+
 interface AskTeacherModalProps {
   isOpen: boolean;
   onClose: () => void;
-  context: {
-    subjectId: 'mathematics' | 'physics' | 'chemistry' | 'english';
-    subjectName: string;
-    chapterId: string;
-    chapterTitle: string;
-    conceptId?: string;
-    conceptName?: string;
-    contextSource: 'lesson' | 'practice' | 'assignment' | 'ai';
-  };
+  context?: QueryModalContext;
   onSubmitted?: (query: StudentQuery) => void;
 }
+
+const teachersBySubject: Record<'mathematics' | 'physics' | 'chemistry' | 'english', { name: string; title: string }> = {
+  physics: { name: 'Ms. Sharma', title: 'Physics Teacher' },
+  mathematics: { name: 'Mr. Verma', title: 'Mathematics Teacher' },
+  chemistry: { name: 'Dr. Kapoor', title: 'Chemistry Teacher' },
+  english: { name: 'Mrs. Iyer', title: 'English Teacher' },
+};
 
 export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
   isOpen,
@@ -25,6 +34,9 @@ export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
   context,
   onSubmitted,
 }) => {
+  const [selectedSubject, setSelectedSubject] = useState<'mathematics' | 'physics' | 'chemistry' | 'english'>(
+    context?.subjectId || 'physics'
+  );
   const [questionText, setQuestionText] = useState('');
   const [hasAttachment, setHasAttachment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,24 +44,30 @@ export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
 
   if (!isOpen) return null;
 
+  const activeTeacher = teachersBySubject[selectedSubject];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!questionText.trim()) return;
 
     setIsSubmitting(true);
+    const subjectName =
+      context?.subjectName ||
+      selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1);
+
     const newQuery = submitStudentQuery({
       studentId: 'student-1',
       studentName: 'Arjun Sharma',
       studentAvatar:
         'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       className: 'Class 12-A',
-      subjectId: context.subjectId,
-      subjectName: context.subjectName,
-      chapterId: context.chapterId,
-      chapterTitle: context.chapterTitle,
-      conceptId: context.conceptId,
-      conceptName: context.conceptName,
-      contextSource: context.contextSource,
+      subjectId: selectedSubject,
+      subjectName,
+      chapterId: context?.chapterId || 'general',
+      chapterTitle: context?.chapterTitle || 'General Curriculum Doubt',
+      conceptId: context?.conceptId,
+      conceptName: context?.conceptName,
+      contextSource: context?.contextSource || 'general',
       message: questionText.trim(),
       attachments: hasAttachment
         ? [
@@ -85,7 +103,7 @@ export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
                 Ask Your Teacher
               </h3>
               <p className="text-xs text-[#667085]">
-                Direct academic question for Ms. Sharma (Class 12-A)
+                Direct academic doubt for {activeTeacher.name} ({activeTeacher.title}, Class 12-A)
               </p>
             </div>
           </div>
@@ -100,25 +118,59 @@ export const AskTeacherModal: React.FC<AskTeacherModalProps> = ({
 
         {!submitted ? (
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Automatic Context Banner */}
-            <div className="p-3 bg-[#FAFBFD] rounded-2xl border border-slate-200 text-xs space-y-1">
-              <div className="flex items-center justify-between text-[#667085]">
-                <span className="text-[10px] font-black uppercase tracking-wider">
-                  Automatic Context Attached
-                </span>
-                <span className="capitalize font-bold text-[#172033]">
-                  Source: {context.contextSource}
-                </span>
-              </div>
-              <p className="font-bold text-[#172033]">
-                {context.subjectName} • {context.chapterTitle}
-              </p>
-              {context.conceptName && (
-                <p className="text-[11px] text-[#667085]">
-                  Focus: {context.conceptName}
+            {/* Context Banner or Subject Selector */}
+            {context?.subjectName ? (
+              <div className="p-3 bg-[#FAFBFD] rounded-2xl border border-slate-200 text-xs space-y-1">
+                <div className="flex items-center justify-between text-[#667085]">
+                  <span className="text-[10px] font-black uppercase tracking-wider">
+                    Context Attached
+                  </span>
+                  <span className="capitalize font-bold text-[#172033]">
+                    Source: {context.contextSource || 'general'}
+                  </span>
+                </div>
+                <p className="font-bold text-[#172033]">
+                  {context.subjectName} • {context.chapterTitle}
                 </p>
-              )}
-            </div>
+                {context.conceptName && (
+                  <p className="text-[11px] text-[#667085]">
+                    Focus: {context.conceptName}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-[#667085] block">
+                  Select Subject & Teacher:
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['physics', 'chemistry', 'mathematics', 'english'] as const).map((s) => {
+                    const t = teachersBySubject[s];
+                    const isSelected = selectedSubject === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setSelectedSubject(s)}
+                        className={cn(
+                          'p-2.5 rounded-xl border text-left transition-all',
+                          isSelected
+                            ? 'bg-purple-50 border-purple-300 text-purple-900 shadow-xs ring-1 ring-purple-300'
+                            : 'bg-white border-slate-200 text-[#667085] hover:bg-slate-50'
+                        )}
+                      >
+                        <span className="text-xs font-black block capitalize text-[#172033]">
+                          {s}
+                        </span>
+                        <span className="text-[10px] text-[#667085] block truncate">
+                          {t.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Question Text Area */}
             <div className="space-y-1.5">
