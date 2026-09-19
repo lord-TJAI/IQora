@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { cbse2026Curriculum } from '@/services/mock/curriculumData';
-import { SubjectId } from '@/types/domain';
+import { getSubjectCurriculum } from '@/data/curriculum';
+import { SubjectId } from '@/types/curriculum';
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,6 +12,12 @@ import {
   ArrowDown,
   Sparkles,
   Play,
+  Layers,
+  Award,
+  BookOpen,
+  Calculator,
+  Atom,
+  FlaskConical,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -24,12 +30,29 @@ export const SubjectJourney: React.FC = () => {
       ? subjectId
       : 'physics';
 
-  const subjectData = cbse2026Curriculum.subjects[validSubjectId];
-  const { info, units } = subjectData;
+  const subjectData = getSubjectCurriculum(validSubjectId);
+  const [expandedChapterId, setExpandedChapterId] = useState<string | null>(subjectData.currentChapterId);
 
-  const handleOpenLesson = (chapterId: string, conceptId?: string) => {
-    navigate('/student/lesson/phys-ch2-l3');
+  const handleOpenConcept = (conceptId: string) => {
+    navigate(`/student/lesson/${conceptId}`);
   };
+
+  const getSubjectIcon = (id: string) => {
+    switch (id) {
+      case 'mathematics':
+        return Calculator;
+      case 'physics':
+        return Atom;
+      case 'chemistry':
+        return FlaskConical;
+      case 'english':
+        return BookOpen;
+      default:
+        return BookOpen;
+    }
+  };
+
+  const Icon = getSubjectIcon(validSubjectId);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-300">
@@ -44,30 +67,46 @@ export const SubjectJourney: React.FC = () => {
         </button>
 
         <span className="text-xs font-bold text-[#667085]">
-          CBSE Class 12 • Code {validSubjectId === 'mathematics' ? '041' : validSubjectId === 'physics' ? '042' : validSubjectId === 'chemistry' ? '043' : '301'}
+          CBSE Class 12 • Code {subjectData.code}
         </span>
       </div>
 
       {/* Subject Header Banner */}
       <div
-        className="p-6 sm:p-7 rounded-3xl border shadow-subtle flex items-center justify-between"
-        style={{ backgroundColor: info.lightColor, borderColor: info.color + '30' }}
+        className="p-6 sm:p-7 rounded-3xl border shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        style={{ backgroundColor: subjectData.lightColor, borderColor: subjectData.color + '30' }}
       >
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
-            {info.name}
-          </h1>
-          <p className="text-xs sm:text-sm font-medium text-[#667085] mt-1">
-            Follow the path to master each concept step-by-step
-          </p>
+        <div className="flex items-center gap-4">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-xs p-3 flex-shrink-0"
+            style={{ backgroundColor: subjectData.color }}
+          >
+            <Icon className="w-7 h-7 stroke-[2.2]" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#667085]">
+                Subject Journey
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/80 text-[#172033]">
+                {subjectData.units.length} Units
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
+              {subjectData.name}
+            </h1>
+            <p className="text-xs sm:text-sm font-medium text-[#667085] mt-0.5">
+              {subjectData.tagline}
+            </p>
+          </div>
         </div>
 
-        <div className="text-right">
+        <div className="text-right flex sm:flex-col items-center sm:items-end justify-between">
           <span className="text-3xl font-black text-[#172033] block">
-            {info.overallMastery}%
+            {subjectData.overallMastery}%
           </span>
           <span className="text-[10px] font-bold uppercase tracking-wider text-[#667085]">
-            Mastery
+            Overall Mastery
           </span>
         </div>
       </div>
@@ -76,7 +115,7 @@ export const SubjectJourney: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Visual Learning Path (The Path IS the Index!) */}
         <div className="lg:col-span-8 space-y-6">
-          {units.map((unit) => (
+          {subjectData.units.map((unit) => (
             <div
               key={unit.id}
               className="bg-white rounded-3xl border border-[#E6EAF0] p-6 sm:p-7 shadow-subtle space-y-6"
@@ -85,28 +124,29 @@ export const SubjectJourney: React.FC = () => {
               <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#667085]">
-                    Unit {unit.unitNumber}
+                    Unit {unit.unitNumber} {unit.marksWeightage ? `• ${unit.marksWeightage} Marks` : ''}
                   </span>
                   <h3 className="text-base sm:text-lg font-black text-[#172033]">
                     {unit.title}
                   </h3>
                 </div>
                 <span className="text-xs font-black text-[#172033]">
-                  {unit.masteryPercentage}%
+                  {unit.masteryPercentage}% Mastery
                 </span>
               </div>
 
               {/* Sequential Path of Chapters and Concepts */}
               <div className="space-y-4">
                 {unit.chapters.map((chapter, chIdx) => {
-                  const isCurrentChapter = chapter.id === info.currentChapterId;
+                  const isCurrentChapter = chapter.id === subjectData.currentChapterId;
+                  const isExpanded = expandedChapterId === chapter.id;
                   const isCompleted = chapter.masteryPercentage >= 80;
 
                   return (
                     <div key={chapter.id} className="space-y-3">
                       {/* Chapter Node */}
                       <div
-                        onClick={() => handleOpenLesson(chapter.id)}
+                        onClick={() => setExpandedChapterId(isExpanded ? null : chapter.id)}
                         className={cn(
                           'p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 group',
                           isCurrentChapter
@@ -139,9 +179,62 @@ export const SubjectJourney: React.FC = () => {
                           <span className="text-xs font-black text-[#172033]">
                             {chapter.masteryPercentage}%
                           </span>
-                          <ChevronRight className="w-4 h-4 text-[#667085] group-hover:translate-x-1 transition-transform" />
+                          <ChevronDown
+                            className={cn(
+                              'w-4 h-4 text-[#667085] transition-transform duration-200',
+                              isExpanded && 'rotate-180'
+                            )}
+                          />
                         </div>
                       </div>
+
+                      {/* Concepts Drawer (Expanded) */}
+                      {isExpanded && (
+                        <div className="pl-6 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                          {chapter.concepts.map((concept) => (
+                            <div
+                              key={concept.id}
+                              onClick={() => handleOpenConcept(concept.id)}
+                              className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-[#4F7CFF] hover:shadow-xs transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                            >
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#EFF4FF] text-[#4F7CFF]">
+                                    {concept.activityType}
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase',
+                                      concept.state === 'mastered'
+                                        ? 'bg-emerald-50 text-emerald-700'
+                                        : concept.state === 'strong'
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'bg-amber-50 text-amber-700'
+                                    )}
+                                  >
+                                    {concept.state}
+                                  </span>
+                                </div>
+                                <h5 className="text-xs sm:text-sm font-bold text-[#172033] group-hover:text-[#4F7CFF] transition-colors">
+                                  {concept.name}
+                                </h5>
+                                <p className="text-[11px] text-[#667085] line-clamp-1">
+                                  {concept.learningObjective}
+                                </p>
+                              </div>
+
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-xs font-bold text-[#172033]">
+                                  {concept.masteryPercentage}%
+                                </span>
+                                <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-[#4F7CFF] group-hover:text-white transition-colors">
+                                  <Play className="w-3.5 h-3.5 fill-current" />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
                       {/* Directional Connector Arrow between chapters */}
                       {chIdx < unit.chapters.length - 1 && (
@@ -162,20 +255,22 @@ export const SubjectJourney: React.FC = () => {
           {/* Progress Card */}
           <div className="bg-white rounded-3xl border border-[#E6EAF0] p-5 shadow-subtle space-y-4">
             <h3 className="text-xs font-black uppercase tracking-wider text-[#667085]">
-              Your Progress
+              Syllabus Coverage
             </h3>
 
             <div className="space-y-3">
               <div className="flex justify-between text-xs font-bold text-[#172033]">
-                <span>Syllabus Lessons</span>
-                <span>{info.completedLessons} / {info.totalLessons}</span>
+                <span>Completed Lessons</span>
+                <span>
+                  {subjectData.completedLessons} / {subjectData.totalLessons}
+                </span>
               </div>
               <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full"
+                  className="h-full rounded-full transition-all"
                   style={{
-                    width: `${(info.completedLessons / info.totalLessons) * 100}%`,
-                    backgroundColor: info.color,
+                    width: `${(subjectData.completedLessons / subjectData.totalLessons) * 100}%`,
+                    backgroundColor: subjectData.color,
                   }}
                 />
               </div>
@@ -184,21 +279,25 @@ export const SubjectJourney: React.FC = () => {
             <div className="pt-2 border-t border-slate-100 text-xs space-y-2">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-[#667085]">Completed Chapters: <strong>4</strong></span>
+                <span className="text-[#667085]">
+                  Active Board Syllabus: <strong>2026–27</strong>
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#FFC800]" />
-                <span className="text-[#667085]">In Progress: <strong>Electrostatics</strong></span>
+                <span className="text-[#667085]">
+                  Focus Chapter: <strong>{subjectData.currentChapterId}</strong>
+                </span>
               </div>
             </div>
           </div>
 
           {/* Direct CTA */}
           <button
-            onClick={() => navigate('/student/lesson/phys-ch2-l3')}
+            onClick={() => handleOpenConcept(subjectData.currentConceptId)}
             className="w-full py-3.5 px-5 rounded-2xl bg-[#172033] hover:bg-slate-800 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all"
           >
-            <span>CONTINUE CURRENT LESSON</span>
+            <span>CONTINUE CURRENT CONCEPT</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

@@ -134,7 +134,16 @@ export interface Lesson {
   };
 }
 
-export type QuestionType = 'mcq' | 'numerical' | 'short_answer' | 'true_false' | 'fill_blank';
+export type QuestionType =
+  | 'mcq'
+  | 'numerical'
+  | 'short_answer'
+  | 'true_false'
+  | 'fill_blank'
+  | 'calculation'
+  | 'assertion_reason'
+  | 'prediction'
+  | 'evidence_selection';
 
 export interface Question {
   id: string;

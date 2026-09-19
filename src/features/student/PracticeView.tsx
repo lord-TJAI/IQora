@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QuestionCard } from '@/components/learning/QuestionCard';
-import { Question, SubjectId } from '@/types/domain';
-import { mockCurrentLesson } from '@/services/mock/mockData';
+import { Question, SubjectId as DomainSubjectId } from '@/types/domain';
+import { SubjectId, PracticeQuestion } from '@/types/curriculum';
+import { getAllSubjects, getSubjectCurriculum, getTopicPractice } from '@/data/curriculum';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
 import {
@@ -34,40 +35,21 @@ export const PracticeView: React.FC = () => {
   const [selectedTopic, setSelectedTopic] = useState<{ id: string; name: string; mastery: number } | null>(null);
   const [selectedMode, setSelectedMode] = useState<'quick' | 'adaptive' | 'weak_area' | 'exam'>('adaptive');
 
-  // Subjects
-  const subjects = [
-    { id: 'mathematics', name: 'Mathematics', icon: Calculator, color: '#4F7CFF', mastery: 78 },
-    { id: 'physics', name: 'Physics', icon: Atom, color: '#7C4DFF', mastery: 72 },
-    { id: 'chemistry', name: 'Chemistry', icon: FlaskConical, color: '#20C997', mastery: 64 },
-    { id: 'english', name: 'English Core', icon: BookOpen, color: '#FF8A3D', mastery: 81 },
-  ];
+  const subjects = getAllSubjects();
 
-  // Topics per Subject
-  const topicsMap: Record<SubjectId, { id: string; name: string; mastery: number }[]> = {
-    mathematics: [
-      { id: 'math-top-1', name: 'Calculus: Continuity & Derivatives', mastery: 70 },
-      { id: 'math-top-2', name: 'Integrals & Definite Area', mastery: 50 },
-      { id: 'math-top-3', name: 'Matrices & Linear Systems', mastery: 75 },
-      { id: 'math-top-4', name: 'Vectors & 3D Geometry', mastery: 60 },
-    ],
-    physics: [
-      { id: 'phys-top-1', name: 'Electrostatics & Potential', mastery: 82 },
-      { id: 'phys-top-2', name: 'Current Electricity & Circuits', mastery: 68 },
-      { id: 'phys-top-3', name: 'Magnetism & Moving Charges', mastery: 54 },
-      { id: 'phys-top-4', name: 'Ray & Wave Optics', mastery: 52 },
-    ],
-    chemistry: [
-      { id: 'chem-top-1', name: 'Electrochemistry & Cells', mastery: 72 },
-      { id: 'chem-top-2', name: 'Chemical Kinetics & Rate Laws', mastery: 65 },
-      { id: 'chem-top-3', name: 'Coordination Compounds', mastery: 60 },
-      { id: 'chem-top-4', name: 'Organic Reaction Mechanisms', mastery: 58 },
-    ],
-    english: [
-      { id: 'eng-top-1', name: 'Reading Comprehension & Tone', mastery: 88 },
-      { id: 'eng-top-2', name: 'Creative Writing Formats (Notice/Article)', mastery: 82 },
-      { id: 'eng-top-3', name: 'Flamingo Literature Analysis', mastery: 85 },
-      { id: 'eng-top-4', name: 'Vistas Prose Comprehension', mastery: 76 },
-    ],
+  const getSubjectIcon = (id: string) => {
+    switch (id) {
+      case 'mathematics':
+        return Calculator;
+      case 'physics':
+        return Atom;
+      case 'chemistry':
+        return FlaskConical;
+      case 'english':
+        return BookOpen;
+      default:
+        return BookOpen;
+    }
   };
 
   // Practice Modes
@@ -102,59 +84,42 @@ export const PracticeView: React.FC = () => {
     },
   ];
 
-  // Questions for active session
-  const questions: Question[] = [
-    mockCurrentLesson.interactiveQuestion,
-    {
-      id: 'q-prac-2',
-      subjectId: 'physics',
-      topicId: 'phys-ch2',
-      conceptId: 'c-potential',
-      conceptName: 'Equipotential Surfaces',
-      type: 'mcq',
-      prompt:
-        'Work done in moving a test charge q over an equipotential surface between two points separated by distance d is:',
-      options: ['Zero', 'q × E × d', 'q / (4πε₀d)', 'Infinite'],
-      correctAnswer: 'Zero',
-      explanation:
-        'Since the potential is identical everywhere on an equipotential surface (V_A = V_B), the potential difference ΔV = 0. Therefore, work W = qΔV = 0.',
-      hints: ['Definition: An equipotential surface has equal potential at every point.'],
-      xpReward: 20,
-      masteryGain: 5,
-      difficulty: 'easy',
-    },
-    {
-      id: 'q-prac-3',
-      subjectId: 'physics',
-      topicId: 'phys-ch2',
-      conceptId: 'c-potential',
-      conceptName: 'Potential Gradient',
-      type: 'mcq',
-      prompt:
-        'If the electric potential in a region is given by V = 6x - 8xy² - 8y + 6yz, what is the electric force experienced by a +2 C charge placed at origin (0,0,0)?',
-      options: ['20 N', '10 N', '-20 N', '0 N'],
-      correctAnswer: '20 N',
-      explanation:
-        'Ex = -∂V/∂x = -(6 - 8y²) = -6 N/C at (0,0). Ey = -∂V/∂y = -(-16xy - 8 + 6z) = 8 N/C at (0,0). Ez = -∂V/∂z = -(6y) = 0. Net field E = √(6² + 8²) = 10 N/C. Force F = qE = 2 × 10 = 20 N.',
-      hints: ['Find partial derivatives of V with respect to x, y, and z.'],
-      xpReward: 35,
-      masteryGain: 8,
-      difficulty: 'hard',
-    },
-  ];
-
+  // Active Session Questions
+  const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionScore, setSessionScore] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
 
+  const startSession = () => {
+    if (!selectedSubject) return;
+    const rawQuestions = getTopicPractice(selectedSubject, selectedTopic?.id);
+
+    // Convert PracticeQuestion to domain Question
+    const domainQuestions: Question[] = rawQuestions.map((q, idx) => ({
+      ...q,
+      subjectId: selectedSubject as DomainSubjectId,
+      topicId: selectedTopic?.id || 'general',
+      xpReward: 25,
+      masteryGain: 5,
+    }));
+
+    setSessionQuestions(domainQuestions);
+    setCurrentIndex(0);
+    setSessionScore(0);
+    setIsCompleted(false);
+    setStep('active_session');
+  };
+
   const handleNextQuestion = (isCorrect: boolean) => {
     if (isCorrect) {
       setSessionScore((s) => s + 1);
-      addXP(questions[currentIndex].xpReward);
-      updateMastery('physics', questions[currentIndex].masteryGain);
+      addXP(sessionQuestions[currentIndex].xpReward);
+      if (selectedSubject) {
+        updateMastery(selectedSubject, sessionQuestions[currentIndex].masteryGain);
+      }
     }
 
-    if (currentIndex + 1 < questions.length) {
+    if (currentIndex + 1 < sessionQuestions.length) {
       setCurrentIndex((i) => i + 1);
     } else {
       setIsCompleted(true);
@@ -179,13 +144,13 @@ export const PracticeView: React.FC = () => {
           <span>
             {step === 'select_subject' && 'Back to Home'}
             {step === 'select_topic' && 'Back to Subjects'}
-            {step === 'select_mode' && 'Back to Topics'}
+            {step === 'select_mode' && 'Back to Chapters'}
             {step === 'active_session' && 'Exit Practice'}
           </span>
         </button>
 
         <span className="text-xs font-bold text-[#667085] uppercase tracking-wider">
-          Practice Engine
+          CBSE Practice Engine
         </span>
       </div>
 
@@ -196,28 +161,28 @@ export const PracticeView: React.FC = () => {
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
-              Practice
+              Adaptive Practice
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#667085] mt-1">
-              Choose what you want to practice.
+              Select a subject to practice real CBSE Class XII questions.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {subjects.map((subj) => {
-              const Icon = subj.icon;
+              const Icon = getSubjectIcon(subj.id);
               return (
                 <div
                   key={subj.id}
                   onClick={() => {
-                    setSelectedSubject(subj.id as SubjectId);
+                    setSelectedSubject(subj.id);
                     setStep('select_topic');
                   }}
                   className="bg-white rounded-3xl border border-[#E6EAF0] p-6 hover:border-[#D0D5DD] hover:shadow-subtle transition-all cursor-pointer flex items-center justify-between gap-4 group"
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform"
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform p-2.5"
                       style={{ backgroundColor: subj.color }}
                     >
                       <Icon className="w-6 h-6 stroke-[2.2]" />
@@ -227,7 +192,7 @@ export const PracticeView: React.FC = () => {
                         {subj.name}
                       </h3>
                       <span className="text-xs text-[#667085]">
-                        {subj.mastery}% mastery
+                        {subj.overallMastery}% mastery • {subj.units.length} Units
                       </span>
                     </div>
                   </div>
@@ -241,142 +206,178 @@ export const PracticeView: React.FC = () => {
       )}
 
       {/* =================================================================== */}
-      {/* STEP 2: CHOOSE TOPIC                                                */}
+      {/* STEP 2: CHOOSE TOPIC / CHAPTER                                      */}
       {/* =================================================================== */}
       {step === 'select_topic' && selectedSubject && (
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight capitalize">
-              {selectedSubject} Practice
+              {selectedSubject} Topics
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#667085] mt-1">
-              Select a chapter or topic to practice.
+              Select a chapter or unit to practice.
             </p>
           </div>
 
           <div className="space-y-3">
-            {topicsMap[selectedSubject].map((topic) => (
-              <div
-                key={topic.id}
-                onClick={() => {
-                  setSelectedTopic(topic);
-                  setStep('select_mode');
-                }}
-                className="bg-white rounded-2xl sm:rounded-3xl border border-[#E6EAF0] p-5 hover:border-[#D0D5DD] hover:shadow-subtle transition-all cursor-pointer flex items-center justify-between gap-4 group"
-              >
-                <div>
-                  <h3 className="text-sm sm:text-base font-black text-[#172033] group-hover:text-[#4F7CFF] transition-colors">
-                    {topic.name}
-                  </h3>
-                  <span className="text-xs text-[#667085]">
-                    {topic.mastery}% mastered
-                  </span>
-                </div>
+            {getSubjectCurriculum(selectedSubject).units.flatMap((unit) =>
+              unit.chapters.map((chapter) => (
+                <div
+                  key={chapter.id}
+                  onClick={() => {
+                    setSelectedTopic({
+                      id: chapter.id,
+                      name: chapter.title,
+                      mastery: chapter.masteryPercentage,
+                    });
+                    setStep('select_mode');
+                  }}
+                  className="bg-white rounded-2xl border border-[#E6EAF0] p-4 sm:p-5 hover:border-[#CBD5E1] hover:shadow-xs transition-all cursor-pointer flex items-center justify-between gap-4 group"
+                >
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-[#667085] uppercase tracking-wider block">
+                      Unit {unit.unitNumber}: {unit.title}
+                    </span>
+                    <h3 className="text-sm sm:text-base font-bold text-[#172033] group-hover:text-[#4F7CFF] transition-colors">
+                      {chapter.title}
+                    </h3>
+                  </div>
 
-                <button className="px-4 py-2 rounded-xl text-xs font-black bg-[#F7F9FC] group-hover:bg-[#FFC800] group-hover:text-[#172033] text-[#667085] transition-colors">
-                  PRACTICE
-                </button>
-              </div>
-            ))}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-black text-[#172033]">
+                      {chapter.masteryPercentage}%
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-[#667085] group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
 
       {/* =================================================================== */}
-      {/* STEP 3: CHOOSE PRACTICE MODE                                        */}
+      {/* STEP 3: CHOOSE MODE                                                 */}
       {/* =================================================================== */}
       {step === 'select_mode' && selectedTopic && (
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
-              {selectedTopic.name}
+              Select Practice Mode
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#667085] mt-1">
-              Choose your practice workout mode.
+              Practicing: <strong className="text-[#172033]">{selectedTopic.name}</strong>
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {modes.map((mode) => {
               const Icon = mode.icon;
+              const isSelected = selectedMode === mode.id;
+
               return (
                 <div
                   key={mode.id}
-                  onClick={() => {
-                    setSelectedMode(mode.id as any);
-                    setStep('active_session');
-                  }}
-                  className="bg-white rounded-3xl border border-[#E6EAF0] p-6 hover:border-[#D0D5DD] hover:shadow-subtle transition-all cursor-pointer flex flex-col justify-between gap-4 group"
+                  onClick={() => setSelectedMode(mode.id as any)}
+                  className={cn(
+                    'bg-white rounded-3xl border p-5 sm:p-6 transition-all cursor-pointer flex flex-col justify-between gap-4',
+                    isSelected
+                      ? 'border-[#FFC800] ring-2 ring-[#FFC800]/20 shadow-xs'
+                      : 'border-[#E6EAF0] hover:border-[#D0D5DD]'
+                  )}
                 >
-                  <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center">
-                    <Icon className={cn('w-5 h-5', mode.color)} />
+                  <div className="flex items-start justify-between">
+                    <div className={cn('p-3 rounded-2xl bg-slate-50', mode.color)}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    {isSelected && (
+                      <span className="text-xs font-black text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">
+                        Selected
+                      </span>
+                    )}
                   </div>
 
                   <div>
-                    <h3 className="text-base font-black text-[#172033] group-hover:text-[#4F7CFF] transition-colors">
+                    <h3 className="text-base font-black text-[#172033]">
                       {mode.title}
                     </h3>
-                    <p className="text-xs text-[#667085] mt-1 leading-relaxed">
-                      {mode.desc}
-                    </p>
+                    <p className="text-xs text-[#667085] mt-1">{mode.desc}</p>
                   </div>
-
-                  <span className="text-xs font-black text-[#172033] group-hover:text-[#4F7CFF] flex items-center gap-1">
-                    <span>START</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </span>
                 </div>
               );
             })}
           </div>
+
+          <Button
+            onClick={startSession}
+            className="w-full py-4 rounded-2xl bg-[#FFC800] hover:bg-[#E6B400] text-[#172033] font-black text-sm shadow-brand"
+          >
+            START PRACTICE SESSION
+          </Button>
         </div>
       )}
 
       {/* =================================================================== */}
       {/* STEP 4: ACTIVE PRACTICE SESSION                                     */}
       {/* =================================================================== */}
-      {step === 'active_session' && (
+      {step === 'active_session' && sessionQuestions.length > 0 && (
         <div className="space-y-6">
           {!isCompleted ? (
-            <QuestionCard
-              key={questions[currentIndex].id}
-              question={questions[currentIndex]}
-              questionNumber={currentIndex + 1}
-              totalQuestions={questions.length}
-              onNext={handleNextQuestion}
-              onAskAi={() => navigate('/student/ai?action=explain')}
-            />
+            <div className="space-y-4">
+              <QuestionCard
+                question={sessionQuestions[currentIndex]}
+                questionNumber={currentIndex + 1}
+                totalQuestions={sessionQuestions.length}
+                onNext={handleNextQuestion}
+                onAskAi={() => navigate('/student/ai?action=explain')}
+              />
+            </div>
           ) : (
-            <div className="text-center p-8 sm:p-10 bg-white rounded-3xl border border-[#E6EAF0] shadow-subtle space-y-5">
+            <div className="bg-white rounded-3xl border border-[#E6EAF0] p-8 text-center space-y-6 shadow-subtle animate-in zoom-in-95 duration-200">
               <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-8 h-8" />
+                <CheckCircle2 className="w-8 h-8 stroke-[2.5]" />
               </div>
-              <h2 className="text-2xl font-black text-[#172033]">
-                Practice Complete!
-              </h2>
-              <p className="text-xs sm:text-sm text-[#667085] max-w-sm mx-auto">
-                You scored {sessionScore} of {questions.length} correct in{' '}
-                <strong className="text-[#172033]">{selectedTopic?.name}</strong>.
-              </p>
 
-              <div className="flex items-center justify-center gap-3 pt-2">
+              <div>
+                <h2 className="text-2xl font-black text-[#172033]">
+                  Practice Complete!
+                </h2>
+                <p className="text-sm font-medium text-[#667085] mt-1">
+                  You answered {sessionScore} of {sessionQuestions.length} questions correctly.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                  <span className="text-2xl font-black text-amber-900 block">
+                    +{sessionScore * 25}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase text-amber-700">
+                    XP Earned
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+                  <span className="text-2xl font-black text-purple-900 block">
+                    +{sessionScore * 5}%
+                  </span>
+                  <span className="text-[10px] font-bold uppercase text-purple-700">
+                    Mastery Gain
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 max-w-sm mx-auto">
                 <Button
-                  variant="primary"
-                  size="md"
-                  className="bg-[#172033] text-white hover:bg-slate-800"
-                  onClick={() => setStep('select_topic')}
+                  variant="outline"
+                  onClick={() => setStep('select_subject')}
+                  className="flex-1 rounded-xl"
                 >
-                  Choose Another Topic
+                  New Topic
                 </Button>
                 <Button
-                  variant="secondary"
-                  size="md"
-                  leftIcon={<RotateCcw className="w-4 h-4" />}
-                  onClick={() => {
-                    setCurrentIndex(0);
-                    setSessionScore(0);
-                    setIsCompleted(false);
-                  }}
+                  onClick={() => startSession()}
+                  className="flex-1 rounded-xl bg-[#172033] text-white hover:bg-slate-800"
                 >
                   Practice Again
                 </Button>
