@@ -1,186 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
-import { teacherService, TeacherDashboardStats } from '@/services/teacherService';
-import { StatCard, Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { ConceptGapCard } from '@/components/teacher/ConceptGapCard';
-import { InterventionCard } from '@/components/teacher/InterventionCard';
-import { PerformanceChart } from '@/components/teacher/PerformanceChart';
-import { Users, CalendarCheck, Award, FileText, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import {
+  Users,
+  CalendarCheck,
+  AlertCircle,
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  Clock,
+} from 'lucide-react';
+import { cn } from '@/utils/cn';
 
 export const TeacherDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { teacherData } = useAuthStore();
-  const [data, setData] = useState<TeacherDashboardStats | null>(null);
-
-  useEffect(() => {
-    teacherService.getDashboardData('12-A').then(setData);
-  }, []);
-
-  if (!data) {
-    return (
-      <div className="py-12 text-center">
-        <div className="w-8 h-8 rounded-full border-4 border-brand-primary border-t-transparent animate-spin mx-auto" />
-      </div>
-    );
-  }
+  const [selectedClass, setSelectedClass] = useState<string>('12-A');
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-200">
-      {/* Header */}
+    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-300">
+      {/* 1. Header: Greeting & Class Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-brand-text-primary tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#172033] tracking-tight">
             Good morning, {teacherData?.title || 'Ms. Sharma'}
           </h1>
-          <p className="text-sm text-brand-text-secondary mt-1">
-            Class 12-A Command Center • 42 Students Enrolled
+          <p className="text-xs sm:text-sm text-[#667085] mt-0.5">
+            What needs your attention today?
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => navigate('/teacher/assignments/new')}
+        {/* Class Selector Dropdown */}
+        <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-[#E6EAF0] shadow-2xs self-start sm:self-auto">
+          <span className="text-xs font-bold text-[#667085]">Class:</span>
+          <select
+            value={selectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
+            className="text-xs font-black text-[#172033] bg-transparent focus:outline-none cursor-pointer"
           >
-            + Create Assignment
-          </Button>
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={() => navigate('/teacher/tests/new')}
-          >
-            + Create Test
-          </Button>
+            <option value="12-A">Class 12-A (Physics)</option>
+            <option value="12-B">Class 12-B (Physics)</option>
+          </select>
         </div>
       </div>
 
-      {/* Top 4 Metrics Grid */}
+      {/* 2. Today's Core Attention Numbers (4 Scannable Blocks) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Total Students"
-          value={data.totalStudents}
-          subvalue="Class 12-A"
-          icon={<Users className="w-5 h-5 text-brand-ai" />}
-        />
-        <StatCard
-          label="Attendance Today"
-          value={`${data.attendanceToday}%`}
-          trend={{ value: '↑ 2% vs last week', isPositive: true }}
-          icon={<CalendarCheck className="w-5 h-5 text-emerald-500" />}
-        />
-        <StatCard
-          label="Class Average"
-          value={`${data.classAverage}%`}
-          trend={{ value: '↑ 4% this month', isPositive: true }}
-          icon={<Award className="w-5 h-5 text-amber-500" />}
-        />
-        <StatCard
-          label="Active Tasks"
-          value={data.activeTasksCount}
-          subvalue="8 pending review"
-          icon={<FileText className="w-5 h-5 text-blue-500" />}
-        />
+        <div className="bg-white rounded-3xl border border-[#E6EAF0] p-5 shadow-subtle space-y-1">
+          <span className="text-[11px] font-bold text-[#667085] uppercase tracking-wider block">
+            Enrolled Students
+          </span>
+          <span className="text-2xl sm:text-3xl font-black text-[#172033] block">
+            42
+          </span>
+          <span className="text-[11px] text-[#667085]">Section {selectedClass}</span>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-[#E6EAF0] p-5 shadow-subtle space-y-1">
+          <span className="text-[11px] font-bold text-[#667085] uppercase tracking-wider block">
+            Attendance Today
+          </span>
+          <span className="text-2xl sm:text-3xl font-black text-emerald-600 block">
+            94%
+          </span>
+          <span className="text-[11px] text-emerald-700 font-semibold">38 Present • 4 Absent</span>
+        </div>
+
+        <div
+          onClick={() => navigate('/teacher/submissions')}
+          className="bg-white rounded-3xl border border-[#E6EAF0] p-5 shadow-subtle space-y-1 hover:border-amber-300 transition-colors cursor-pointer"
+        >
+          <span className="text-[11px] font-bold text-[#667085] uppercase tracking-wider block">
+            Pending Review
+          </span>
+          <span className="text-2xl sm:text-3xl font-black text-amber-600 block">
+            3
+          </span>
+          <span className="text-[11px] text-amber-700 font-semibold">Submissions to grade →</span>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-[#E6EAF0] p-5 shadow-subtle space-y-1">
+          <span className="text-[11px] font-bold text-[#667085] uppercase tracking-wider block">
+            Class Average
+          </span>
+          <span className="text-2xl sm:text-3xl font-black text-[#172033] block">
+            76%
+          </span>
+          <span className="text-[11px] text-[#667085]">Across current chapter</span>
+        </div>
       </div>
 
-      {/* Dominant AI Insight Card (Section 39) */}
-      {data.urgentIntervention && (
-        <InterventionCard
-          intervention={data.urgentIntervention}
-          onApprove={(id) => {
-            teacherService.updateInterventionStatus(id, 'approved');
-            navigate('/teacher/interventions');
-          }}
-          onAssign={(id) => {
-            teacherService.updateInterventionStatus(id, 'assigned');
-            navigate('/teacher/interventions');
-          }}
-        />
-      )}
+      {/* 3. Class Concept Gap & Actionable Intervention */}
+      <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 sm:p-7 shadow-subtle space-y-4">
+        <div className="flex items-center gap-2">
+          <AlertCircle className="w-5 h-5 text-amber-500" />
+          <span className="text-xs font-black uppercase tracking-wider text-[#667085]">
+            Class Concept Gap Identified
+          </span>
+        </div>
 
-      {/* Today's Work & Submissions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6 border border-brand-border space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-brand-text-primary">
-              Today's Academic Tasks & Submissions
-            </h3>
-            <Button
-              size="sm"
-              variant="ghost"
-              rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-              onClick={() => navigate('/teacher/submissions')}
-            >
-              Review All
-            </Button>
-          </div>
-
-          <div className="space-y-3">
-            {data.todaysTasks.map((task, idx) => (
-              <div
-                key={idx}
-                className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3"
-              >
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-brand-ai block">
-                    {task.subject}
-                  </span>
-                  <h4 className="text-sm font-bold text-brand-text-primary">
-                    {task.title}
-                  </h4>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <span className="text-xs font-black text-brand-text-primary block">
-                    {task.submitted} / {task.total}
-                  </span>
-                  <span className="text-[10px] text-brand-text-secondary font-semibold">
-                    Submitted
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Subject Mastery Overview Chart */}
-        <PerformanceChart
-          title="Class 12-A Subject Mastery"
-          data={data.subjectMasteries.map((s) => ({ name: s.name, value: s.percentage }))}
-        />
-      </div>
-
-      {/* Concept Gaps Section (Section 39 & 53) */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#FFFBEB] border border-amber-200 p-5 rounded-2xl">
           <div>
-            <h3 className="text-lg font-bold text-brand-text-primary">
-              Identified Concept Gaps in Class 12-A
+            <h3 className="text-base sm:text-lg font-black text-amber-950">
+              17 students need support with Electric Potential
             </h3>
-            <p className="text-xs text-brand-text-secondary">
-              Areas where students need teacher or AI intervention
+            <p className="text-xs sm:text-sm text-amber-900/80 mt-1 leading-relaxed">
+              Frequent mistakes detected in sign convention for work done moving charge against electrostatic field.
             </p>
           </div>
-          <Button
-            size="sm"
-            variant="secondary"
+
+          <button
             onClick={() => navigate('/teacher/interventions')}
+            className="px-6 py-2.5 rounded-full bg-[#172033] hover:bg-slate-800 text-white font-black text-xs sm:text-sm whitespace-nowrap shadow-xs transition-all self-start sm:self-center"
           >
-            All Interventions
-          </Button>
+            Review Intervention →
+          </button>
+        </div>
+      </div>
+
+      {/* 4. Action Area: Pending Submissions to Review */}
+      <div className="bg-white rounded-3xl border border-[#E6EAF0] p-6 sm:p-7 shadow-subtle space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-black text-[#172033] uppercase tracking-wider">
+            Assignments Requiring Evaluation
+          </h3>
+          <button
+            onClick={() => navigate('/teacher/submissions')}
+            className="text-xs font-bold text-[#4F7CFF] hover:underline"
+          >
+            View All Submissions →
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {data.conceptGaps.map((gap, i) => (
-            <ConceptGapCard
-              key={i}
-              concept={gap.concept}
-              mastery={gap.mastery}
-              affectedCount={gap.affectedCount}
-              trend={gap.trend}
-              onReviewIntervention={() => navigate('/teacher/interventions')}
-            />
+        <div className="space-y-3">
+          {[
+            { id: 'sub-1', title: 'Electrostatics Problem Set 1', student: 'Rohan Sharma', time: '1 hour ago' },
+            { id: 'sub-2', title: 'Electric Field Lines Worksheet', student: 'Priya Verma', time: '3 hours ago' },
+            { id: 'sub-3', title: 'Coulomb Law Numerical Practice', student: 'Amit Kumar', time: 'Yesterday' },
+          ].map((item) => (
+            <div
+              key={item.id}
+              onClick={() => navigate('/teacher/submissions')}
+              className="p-3.5 rounded-2xl bg-[#F7F9FC] border border-[#E6EAF0] hover:bg-white hover:border-[#D0D5DD] transition-all cursor-pointer flex items-center justify-between gap-3"
+            >
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-[#172033]">
+                  {item.title}
+                </h4>
+                <span className="text-[11px] text-[#667085]">
+                  Submitted by {item.student} • {item.time}
+                </span>
+              </div>
+
+              <span className="text-xs font-black text-[#4F7CFF] hover:underline">
+                Grade →
+              </span>
+            </div>
           ))}
         </div>
       </div>
