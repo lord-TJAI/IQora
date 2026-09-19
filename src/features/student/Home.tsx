@@ -134,12 +134,12 @@ export const StudentHome: React.FC = () => {
         >
           <div className="flex items-center gap-1.5 text-xs font-black text-[#172033]">
             <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-            <span>14 day streak</span>
+            <span>12 day streak</span>
           </div>
           <span className="w-1 h-1 rounded-full bg-slate-300" />
           <div className="flex items-center gap-1.5 text-xs font-black text-[#172033]">
             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>2,450 XP</span>
+            <span>1,425 XP</span>
           </div>
         </div>
       </div>
@@ -431,7 +431,7 @@ export const StudentHome: React.FC = () => {
                   Your Learning Streak
                 </span>
                 <h3 className="text-2xl font-black text-[#172033] tracking-tight">
-                  14 days
+                  12 days
                 </h3>
                 <p className="text-xs font-semibold text-[#667085] mt-0.5">
                   Keep going! Consistency wins.
