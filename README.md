@@ -1,3 +1,1 @@
 # IQora
-
-tesing by loki
