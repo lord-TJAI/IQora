@@ -6,7 +6,6 @@ let queriesStore: StudentQuery[] = [
     id: 'query-1',
     studentId: 'student-1',
     studentName: 'Arjun Sharma',
-    studentAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
     className: 'Class 12-A',
     subjectId: 'physics',
     subjectName: 'Physics',
@@ -20,8 +19,7 @@ let queriesStore: StudentQuery[] = [
     createdAt: 'Today, 11:30 AM',
     status: 'answered',
     teacherReply: {
-      teacherName: 'Ms. Sharma',
-      teacherAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+      teacherName: 'Mr. Rohan Mehta',
       replyText:
         'Remember the fundamental definition: W = q · ΔV. By definition, every point on an equipotential surface has the exact same potential V_A = V_B. Therefore, the potential difference ΔV is zero regardless of path length or distance. Also note that the electric field is strictly perpendicular to the surface, so E · dl = 0!',
       repliedAt: 'Today, 12:15 PM',
@@ -31,7 +29,6 @@ let queriesStore: StudentQuery[] = [
     id: 'query-2',
     studentId: 'student-1',
     studentName: 'Arjun Sharma',
-    studentAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
     className: 'Class 12-A',
     subjectId: 'mathematics',
     subjectName: 'Mathematics',
@@ -49,7 +46,6 @@ let queriesStore: StudentQuery[] = [
     id: 'query-3',
     studentId: 'student-2',
     studentName: 'Priya Nair',
-    studentAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
     className: 'Class 12-A',
     subjectId: 'chemistry',
     subjectName: 'Chemistry',
@@ -89,15 +85,13 @@ export const submitStudentQuery = (
 export const replyToQuery = (
   queryId: string,
   replyText: string,
-  teacherName = 'Ms. Sharma',
-  teacherAvatar = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
+  teacherName = 'Mr. Rohan Mehta'
 ): StudentQuery | undefined => {
   const target = queriesStore.find((q) => q.id === queryId);
   if (target) {
     target.status = 'answered';
     target.teacherReply = {
       teacherName,
-      teacherAvatar,
       replyText,
       repliedAt: 'Just now',
     };
