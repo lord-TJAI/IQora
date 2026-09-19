@@ -125,6 +125,7 @@ export interface Lesson {
   contentBlocks: LessonContentBlock[];
   interactiveQuestion: Question;
   xpReward: number;
+  estimatedMinutes?: number;
   masteryImpact: {
     conceptId: string;
     conceptName: string;

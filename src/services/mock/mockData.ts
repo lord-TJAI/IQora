@@ -336,6 +336,7 @@ export const mockCurrentLesson: Lesson = {
     difficulty: 'medium',
   },
   xpReward: 30,
+  estimatedMinutes: 12,
   masteryImpact: {
     conceptId: 'c-potential',
     conceptName: 'Electric Potential',
