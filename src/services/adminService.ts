@@ -73,12 +73,6 @@ export const adminService = {
     }
     return apiClient<any[]>('/admin/classes');
   },
-        { id: '12-B', name: 'Class 12-B', stream: 'Science', studentsCount: 39, classTeacher: 'Mr. Amit Verma', room: 'Room 302' },
-        { id: '12-C', name: 'Class 12-C', stream: 'Commerce', studentsCount: 44, classTeacher: 'Mrs. Dsouza', room: 'Room 304' },
-      ];
-    }
-    return apiClient<any[]>('/admin/classes');
-  },
 
   async getSubjects(): Promise<Subject[]> {
     if (USE_MOCKS) {
