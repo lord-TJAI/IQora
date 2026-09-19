@@ -12,7 +12,7 @@ export interface StudentQuery {
   id: string;
   studentId: string;
   studentName: string;
-  studentAvatar: string;
+  studentAvatar?: string;
   className: string;
   subjectId: 'mathematics' | 'physics' | 'chemistry' | 'english';
   subjectName: string;
@@ -28,7 +28,7 @@ export interface StudentQuery {
   status: QueryStatus;
   teacherReply?: {
     teacherName: string;
-    teacherAvatar: string;
+    teacherAvatar?: string;
     replyText: string;
     repliedAt: string;
     attachments?: QueryAttachment[];

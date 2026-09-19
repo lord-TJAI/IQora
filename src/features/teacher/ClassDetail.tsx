@@ -4,6 +4,7 @@ import { Tabs } from '@/components/ui/Drawer';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/Card';
+import { Avatar } from '@/components/ui/Avatar';
 import { mockClass12AStudents, mockSubjects } from '@/services/mock/mockData';
 import { ArrowLeft, Users, CalendarCheck, FileText, Sparkles, BookOpen } from 'lucide-react';
 
