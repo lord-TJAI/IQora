@@ -116,34 +116,7 @@ export const AdminLayout: React.FC = () => {
             </div>
           )}
 
-          {/* Persona switcher */}
-          <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl text-[11px] font-semibold mb-3">
-            <button
-              onClick={() => {
-                switchRole('student');
-                navigate('/student/home');
-              }}
-              className="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center"
-            >
-              Student
-            </button>
-            <button
-              onClick={() => {
-                switchRole('teacher');
-                navigate('/teacher/dashboard');
-              }}
-              className="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center"
-            >
-              Teacher
-            </button>
-            <button
-              onClick={() => switchRole('admin')}
-              className="flex-1 py-1 rounded-lg bg-brand-primary text-brand-text-primary shadow-xs font-bold text-center"
-            >
-              Admin
-            </button>
-          </div>
-
+          {/* Sign out */}
           <button
             onClick={() => {
               logout();

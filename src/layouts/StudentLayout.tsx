@@ -1,106 +1,201 @@
-import React from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, Target, Bot, User, Bell } from 'lucide-react';
+import React, { useState } from 'react';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import {
+  Home,
+  BookOpen,
+  Target,
+  Sparkles,
+  User,
+  Search,
+  Bell,
+  LogOut,
+} from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { StreakBadge, XPBadge, LevelBadge } from '@/components/learning/StreakBadge';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import { cn } from '@/utils/cn';
 
 export const StudentLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { studentData, switchRole } = useAuthStore();
+  const location = useLocation();
+  const { studentData, logout } = useAuthStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const navItems = [
     { to: '/student/home', label: 'Home', icon: Home },
     { to: '/student/learn', label: 'Learn', icon: BookOpen },
     { to: '/student/practice', label: 'Practice', icon: Target },
-    { to: '/student/ai', label: 'AI', icon: Bot, isAi: true },
+    { to: '/student/ai', label: 'AI', icon: Sparkles },
     { to: '/student/profile', label: 'Profile', icon: User },
   ];
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate('/student/learn');
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-brand-bg text-brand-text-primary pb-20 md:pb-6">
-      {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xs border-b border-brand-border px-4 sm:px-8 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
-          {/* Brand Logo & Tagline */}
+    <div className="min-h-screen flex flex-col bg-[#F7F9FC] text-[#172033] pb-24 md:pb-8">
+      {/* Desktop & Tablet Top Navigation Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E6EAF0] px-4 sm:px-8 py-3.5">
+        <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+          {/* 1. Brand Logo */}
           <div
             onClick={() => navigate('/student/home')}
-            className="flex items-center gap-2.5 cursor-pointer select-none"
+            className="flex items-center gap-3 cursor-pointer select-none flex-shrink-0"
           >
-            <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center font-black text-brand-text-primary shadow-xs">
-              IQ
+            <div className="w-10 h-10 rounded-2xl bg-[#FFC800] flex items-center justify-center font-black text-lg text-[#172033] shadow-sm">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="8" cy="12" r="4.5" stroke="#172033" strokeWidth="2.5" />
+                <circle cx="16" cy="12" r="4.5" stroke="#172033" strokeWidth="2.5" />
+                <path d="M12.5 12C12.5 12 14 9.5 16 9.5C18 9.5 19.5 10.6 19.5 12C19.5 13.4 18 14.5 16 14.5C14 14.5 12.5 12 12.5 12ZM12.5 12C12.5 12 11 9.5 9 9.5C7 9.5 5.5 10.6 5.5 12C5.5 13.4 7 14.5 9 14.5C11 14.5 12.5 12 12.5 12Z" fill="#172033" />
+              </svg>
             </div>
-            <div>
-              <span className="text-lg font-black tracking-tight text-brand-text-primary">
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tight text-[#172033] leading-none">
                 IQora
               </span>
-              <span className="hidden sm:inline-block ml-2 text-[11px] font-semibold text-brand-text-secondary">
+              <span className="text-[10px] font-semibold text-[#667085] tracking-wide mt-0.5">
                 Learn. Play. Master.
               </span>
             </div>
           </div>
 
-          {/* Gamification Stats Row */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {studentData && (
-              <>
-                <StreakBadge days={studentData.streakDays} size="sm" />
-                <XPBadge xp={studentData.xp} size="sm" />
-                <div className="hidden sm:block">
-                  <LevelBadge level={studentData.level} title={studentData.levelTitle} />
-                </div>
-              </>
-            )}
+          {/* 2. Center Pill Navigation (Visible on Tablet & Desktop) */}
+          <nav className="hidden md:flex items-center gap-1.5 bg-[#F7F9FC] p-1.5 rounded-full border border-[#E6EAF0]">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                location.pathname === item.to ||
+                (item.to !== '/student/home' && location.pathname.startsWith(item.to));
+
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    'flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold transition-all select-none',
+                    isActive
+                      ? 'bg-[#FFC800] text-[#172033] shadow-xs'
+                      : 'text-[#667085] hover:text-[#172033] hover:bg-white/60'
+                  )}
+                >
+                  <Icon className="w-4 h-4 stroke-[2.2]" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
+
+          {/* 3. Right Controls: Search, Notifications, Profile Avatar */}
+          <div className="flex items-center gap-3">
+            {/* Search Input */}
+            <form onSubmit={handleSearch} className="relative hidden lg:block w-64">
+              <Search className="w-4 h-4 text-[#667085] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search subjects, topics..."
+                className="w-full pl-9 pr-4 py-2 bg-[#F7F9FC] border border-[#E6EAF0] rounded-full text-xs font-medium text-[#172033] placeholder:text-[#98A2B3] focus:outline-none focus:border-[#FFC800] focus:ring-2 focus:ring-[#FFC800]/20 transition-colors"
+              />
+            </form>
 
             {/* Notification Bell */}
             <button
               onClick={() => navigate('/student/notifications')}
-              className="p-2 rounded-xl text-brand-text-secondary hover:text-brand-text-primary hover:bg-slate-100 relative transition-colors"
+              className="p-2.5 rounded-full bg-[#F7F9FC] text-[#667085] hover:text-[#172033] hover:bg-slate-100 relative transition-colors border border-[#E6EAF0]"
               title="Notifications"
             >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-error rounded-full" />
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF5C5C] rounded-full ring-2 ring-white" />
             </button>
 
-            {/* Persona Switcher for Quick Review */}
-            <div className="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+            {/* User Profile Avatar with dropdown */}
+            <div className="relative">
               <button
-                onClick={() => switchRole('student')}
-                className="px-2.5 py-1 rounded-lg bg-white text-brand-text-primary shadow-xs font-bold"
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-[#FFC800]/40 transition-all focus:outline-none"
               >
-                Student
+                <img
+                  src={
+                    studentData?.avatarUrl ||
+                    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+                  }
+                  alt={studentData?.name || 'Arjun'}
+                  className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-xs"
+                />
               </button>
-              <button
-                onClick={() => {
-                  switchRole('teacher');
-                  navigate('/teacher/dashboard');
-                }}
-                className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-brand-text-primary"
-              >
-                Teacher
-              </button>
-              <button
-                onClick={() => {
-                  switchRole('admin');
-                  navigate('/admin/dashboard');
-                }}
-                className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-brand-text-primary"
-              >
-                Admin
-              </button>
+
+              {profileMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setProfileMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-[#E6EAF0] shadow-elevated p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-3 py-2.5 border-b border-[#E6EAF0]">
+                      <p className="text-sm font-bold text-[#172033] truncate">
+                        {studentData?.name || 'Arjun Patel'}
+                      </p>
+                      <p className="text-xs text-[#667085] truncate">
+                        {studentData?.className || 'Class 12-A'}
+                      </p>
+                    </div>
+
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          navigate('/student/profile');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#172033] hover:bg-[#F7F9FC] rounded-xl transition-colors"
+                      >
+                        <User className="w-4 h-4 text-[#667085]" />
+                        <span>My Profile & Stats</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          navigate('/student/mastery');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#172033] hover:bg-[#F7F9FC] rounded-xl transition-colors"
+                      >
+                        <Target className="w-4 h-4 text-[#667085]" />
+                        <span>Mastery Map</span>
+                      </button>
+                    </div>
+
+                    <div className="pt-1 border-t border-[#E6EAF0]">
+                      <button
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          logout();
+                          navigate('/login');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#FF5C5C] hover:bg-rose-50 rounded-xl transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign out</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-6">
+      {/* Main Content Workspace */}
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-8 py-6">
         <Outlet />
       </main>
 
-      {/* Mobile Bottom Navigation (Section 14 & 76) */}
-      <nav className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-brand-border md:hidden shadow-float">
+      {/* Mobile Bottom Navigation (Preserves Focus, 5 Items Only) */}
+      <nav className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#E6EAF0] md:hidden shadow-float">
         <div className="flex items-center justify-around py-2 px-2 max-w-md mx-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -110,12 +205,10 @@ export const StudentLayout: React.FC = () => {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all select-none',
+                    'flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all select-none',
                     isActive
-                      ? item.isAi
-                        ? 'text-brand-ai font-bold scale-105'
-                        : 'text-brand-text-primary font-bold scale-105'
-                      : 'text-brand-text-secondary hover:text-brand-text-primary'
+                      ? 'text-[#172033] font-bold scale-105'
+                      : 'text-[#667085] hover:text-[#172033]'
                   )
                 }
               >
@@ -123,8 +216,8 @@ export const StudentLayout: React.FC = () => {
                   <>
                     <div
                       className={cn(
-                        'p-1 rounded-lg transition-colors',
-                        isActive && (item.isAi ? 'bg-purple-100' : 'bg-brand-primary/20')
+                        'p-1.5 rounded-xl transition-colors',
+                        isActive ? 'bg-[#FFC800] text-[#172033] shadow-xs' : 'text-[#667085]'
                       )}
                     >
                       <Icon className="w-5 h-5 stroke-[2.2]" />
