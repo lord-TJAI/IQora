@@ -102,13 +102,14 @@ export const ClassDetail: React.FC = () => {
               key={st.id}
               variant="interactive"
               onClick={() => navigate(`/teacher/students/${st.id}`)}
-              className="p-4 flex items-center justify-between border border-brand-border"
+              className="p-4 flex items-center justify-between border border-brand-border cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <img
-                  src={st.avatarUrl}
-                  alt={st.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                <Avatar
+                  seed={st.name}
+                  name={st.name}
+                  role="student"
+                  size={40}
                 />
                 <div>
                   <h4 className="text-sm font-bold text-brand-text-primary">{st.name}</h4>
