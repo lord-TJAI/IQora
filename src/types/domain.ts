@@ -184,14 +184,35 @@ export interface NextBestAction {
   }[];
 }
 
-export type TaskType = 'homework' | 'assignment' | 'test' | 'revision' | 'project' | 'practice';
-export type TaskStatus = 'not_started' | 'in_progress' | 'submitted' | 'evaluated' | 'overdue';
+export type TaskType =
+  | 'lesson'
+  | 'homework'
+  | 'assignment'
+  | 'test'
+  | 'revision'
+  | 'teacher_task'
+  | 'practice'
+  | 'project';
+
+export type TaskStatus =
+  | 'not_started'
+  | 'in_progress'
+  | 'submitted'
+  | 'evaluated'
+  | 'completed'
+  | 'overdue'
+  | 'needs_review';
 
 export interface Task {
   id: string;
   title: string;
   subjectId: SubjectId;
   subjectName: string;
+  chapterId?: string;
+  chapterName?: string;
+  conceptId?: string;
+  conceptName?: string;
+  learningObjective?: string;
   teacherId: string;
   teacherName: string;
   type: TaskType;
@@ -207,8 +228,73 @@ export interface Task {
   score?: number;
   feedback?: string;
   submittedDate?: string;
+  submissionText?: string;
   isOverdue?: boolean;
 }
+
+export type ActivityType =
+  | 'simulation'
+  | 'graph'
+  | 'drag_drop'
+  | 'timeline'
+  | 'molecule'
+  | 'circuit'
+  | 'diagram'
+  | 'sorting'
+  | 'annotation'
+  | 'writing'
+  | 'reading'
+  | 'calculation'
+  | 'coordination_builder'
+  | 'reaction_builder';
+
+export interface InteractiveActivity {
+  id: string;
+  type: ActivityType;
+  subject: SubjectId;
+  conceptId: string;
+  conceptName: string;
+  learningObjective: string;
+  instructions: string;
+  parameters?: Record<string, any>;
+  successCondition?: string;
+}
+
+export interface LearningEvidence {
+  id: string;
+  studentId: string;
+  subjectId: SubjectId;
+  chapterId: string;
+  conceptId: string;
+  eventType:
+    | 'activity_started'
+    | 'activity_completed'
+    | 'prediction_correct'
+    | 'prediction_wrong'
+    | 'question_correct'
+    | 'question_wrong'
+    | 'hint_used'
+    | 'concept_explored'
+    | 'lesson_completed'
+    | 'assignment_submitted'
+    | 'test_completed'
+    | 'teacher_feedback_received';
+  timestamp: string;
+  details?: Record<string, any>;
+}
+
+export interface CurriculumUnit {
+  id: string;
+  unitNumber: number;
+  title: string;
+  subjectId: SubjectId;
+  marksWeightage?: number;
+  chapters: Chapter[];
+  masteryPercentage: number;
+  completedLessonsCount: number;
+  totalLessonsCount: number;
+}
+
 
 export interface Test {
   id: string;
