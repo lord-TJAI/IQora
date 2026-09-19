@@ -4,6 +4,7 @@ import { mockClass12AStudents } from '@/services/mock/mockData';
 import { Table, Column, SearchBar } from '@/components/ui/Table';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Avatar } from '@/components/ui/Avatar';
 import { Student } from '@/types/domain';
 import { cn } from '@/utils/cn';
 
@@ -23,13 +24,14 @@ export const StudentsList: React.FC = () => {
       statusFilter === 'all' ||
       (statusFilter === 'needs_attention' && st.statusBadge === 'Needs Attention') ||
       (statusFilter === 'needs_support' && st.statusBadge === 'Needs Support') ||
+      (statusFilter === 'improving' && st.statusBadge === 'Improving') ||
       (statusFilter === 'strong' && st.statusBadge === 'Strong Progress');
 
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status: StudentItem['statusBadge']) => {
-    switch (status) {
+  const getStatusBadge = (badge: StudentItem['statusBadge']) => {
+    switch (badge) {
       case 'Needs Attention':
         return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">Needs Attention</span>;
       case 'Needs Support':
@@ -47,10 +49,11 @@ export const StudentsList: React.FC = () => {
       header: 'Student',
       render: (st) => (
         <div className="flex items-center gap-3">
-          <img
-            src={st.avatarUrl}
-            alt={st.name}
-            className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+          <Avatar
+            seed={st.name}
+            name={st.name}
+            role="student"
+            size={36}
           />
           <div>
             <span className="font-bold text-brand-text-primary block">{st.name}</span>
@@ -138,10 +141,11 @@ export const StudentsList: React.FC = () => {
           <Card className="p-4 border border-brand-border space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img
-                  src={st.avatarUrl}
-                  alt={st.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                <Avatar
+                  seed={st.name}
+                  name={st.name}
+                  role="student"
+                  size={40}
                 />
                 <div>
                   <h4 className="text-sm font-bold text-brand-text-primary">{st.name}</h4>

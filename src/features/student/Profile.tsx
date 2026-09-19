@@ -4,6 +4,7 @@ import { getStudentProgression } from '@/services/progression/progressionService
 import { useAuthStore } from '@/stores/authStore';
 import { StreakHeatmap } from '@/components/profile/StreakHeatmap';
 import { Leaderboard } from '@/components/profile/Leaderboard';
+import { Avatar } from '@/components/ui/Avatar';
 import {
   Zap,
   Flame,
@@ -29,7 +30,7 @@ const subjectIcons: Record<string, any> = {
 
 export const StudentProfile: React.FC = () => {
   const navigate = useNavigate();
-  const { logout, studentData } = useAuthStore();
+  const { studentData, logout } = useAuthStore();
   const progression = getStudentProgression();
 
   const handleLogout = () => {
@@ -45,10 +46,12 @@ export const StudentProfile: React.FC = () => {
           {/* Avatar & Student Info */}
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="relative">
-              <img
-                src={studentData?.avatarUrl || progression.avatarUrl}
-                alt={studentData?.name || progression.name}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover ring-4 ring-[#FFC800]/30 shadow-xs"
+              <Avatar
+                seed={studentData?.name || progression.name}
+                name={studentData?.name || progression.name}
+                role="student"
+                size={76}
+                className="ring-4 ring-[#FFC800]/30 shadow-xs"
               />
               <div className="absolute -bottom-1 -right-1 bg-[#172033] text-white px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase border-2 border-white shadow-xs">
                 Lvl {progression.level}

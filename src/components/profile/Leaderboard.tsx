@@ -62,10 +62,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         {podium[1] && (
           <div className="bg-[#FAFBFD] rounded-2xl border border-slate-200 p-3 text-center flex flex-col items-center justify-between h-36">
             <div className="relative">
-              <img
-                src={podium[1].avatarUrl}
-                alt={podium[1].name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-slate-300"
+              <Avatar
+                seed={podium[1].name}
+                name={podium[1].name}
+                role="student"
+                size={40}
+                className="border-2 border-slate-300"
               />
               <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-200 text-[#172033] font-black text-[10px] flex items-center justify-center border border-white">
                 2
@@ -89,10 +91,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         {podium[0] && (
           <div className="bg-[#FFC800]/10 rounded-2xl border border-[#FFC800]/60 p-3 text-center flex flex-col items-center justify-between h-42 shadow-xs">
             <div className="relative">
-              <img
-                src={podium[0].avatarUrl}
-                alt={podium[0].name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-[#FFC800]"
+              <Avatar
+                seed={podium[0].name}
+                name={podium[0].name}
+                role="student"
+                size={48}
+                className="border-2 border-[#FFC800]"
               />
               <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#FFC800] text-[#172033] font-black text-[10px] flex items-center justify-center border border-white shadow-xs">
                 1
@@ -116,10 +120,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         {podium[2] && (
           <div className="bg-[#FAFBFD] rounded-2xl border border-slate-200 p-3 text-center flex flex-col items-center justify-between h-32">
             <div className="relative">
-              <img
-                src={podium[2].avatarUrl}
-                alt={podium[2].name}
-                className="w-9 h-9 rounded-full object-cover border-2 border-amber-600/30"
+              <Avatar
+                seed={podium[2].name}
+                name={podium[2].name}
+                role="student"
+                size={36}
+                className="border-2 border-amber-600/30"
               />
               <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-black text-[10px] flex items-center justify-center border border-white">
                 3
@@ -146,10 +152,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
         <span>{encouragingMessage}</span>
       </div>
 
-      {/* Nearby Ranks for Current User */}
-      <div className="space-y-1.5">
-        <span className="text-[10px] font-black uppercase tracking-wider text-[#667085] block mb-1">
-          Your Rank Standings
+      {/* Nearby Ranks List */}
+      <div className="space-y-1.5 pt-2">
+        <span className="text-[11px] font-black uppercase tracking-wider text-[#667085] px-2 block">
+          Your Ranking Zone
         </span>
 
         {nearbyRanks.map((entry) => {
@@ -159,13 +165,13 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
             <div
               key={entry.rank}
               className={cn(
-                'p-3 rounded-2xl border transition-all flex items-center justify-between text-xs',
+                'flex items-center justify-between p-3 rounded-2xl text-xs transition-all',
                 isUser
-                  ? 'bg-[#FFC800]/15 border-[#FFC800] font-black shadow-xs'
-                  : 'bg-white border-slate-100 hover:bg-[#FAFBFD]'
+                  ? 'bg-[#FFC800]/20 border-2 border-[#FFC800] font-bold shadow-xs'
+                  : 'bg-white border border-slate-100 hover:bg-slate-50'
               )}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <span
                   className={cn(
                     'w-6 text-center font-black',
@@ -175,13 +181,14 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                   #{entry.rank}
                 </span>
 
-                <img
-                  src={entry.avatarUrl}
-                  alt={entry.name}
-                  className="w-7 h-7 rounded-full object-cover border"
+                <Avatar
+                  seed={entry.name}
+                  name={entry.name}
+                  role="student"
+                  size={28}
                 />
 
-                <span className={cn('truncate', isUser ? 'text-[#172033]' : 'text-[#475569]')}>
+                <span className={cn('truncate', isUser ? 'text-[#172033] font-black' : 'text-[#475569]')}>
                   {entry.name} {isUser && '(You)'}
                 </span>
               </div>
