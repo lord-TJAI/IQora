@@ -28,7 +28,7 @@ import { cn } from '@/utils/cn';
 export const TeacherLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { teacherData, switchRole, logout } = useAuthStore();
+  const { teacherData, logout } = useAuthStore();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeClass, setActiveClass] = useState('12-A');
@@ -36,16 +36,10 @@ export const TeacherLayout: React.FC = () => {
   const navItems = [
     { to: '/teacher/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/teacher/classes', label: 'Classes', icon: School },
+    { to: '/teacher/work', label: 'Work', icon: FileText },
     { to: '/teacher/students', label: 'Students', icon: Users },
-    { to: '/teacher/assignments', label: 'Assignments', icon: FileText },
-    { to: '/teacher/homework', label: 'Homework', icon: BookOpenCheck },
-    { to: '/teacher/tests', label: 'Tests', icon: CheckSquare },
     { to: '/teacher/attendance', label: 'Attendance', icon: CalendarCheck },
-    { to: '/teacher/submissions', label: 'Submissions', icon: Inbox },
-    { to: '/teacher/analytics', label: 'Analytics', icon: BarChart3 },
-    { to: '/teacher/interventions', label: 'AI Interventions', icon: Sparkles, isAi: true },
-    { to: '/teacher/materials', label: 'Study Materials', icon: FolderArchive },
-    { to: '/teacher/settings', label: 'Settings', icon: Settings },
+    { to: '/teacher/insights', label: 'Insights', icon: Sparkles, isAi: true },
   ];
 
   return (
@@ -196,7 +190,7 @@ export const TeacherLayout: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/teacher/interventions')}
+              onClick={() => navigate('/teacher/insights')}
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 text-brand-ai border border-purple-200 text-xs font-bold hover:bg-purple-100 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
