@@ -38,6 +38,8 @@ import { NotificationsView } from '@/features/student/Notifications';
 
 // Teacher Features
 import { TeacherDashboard } from '@/features/teacher/TeacherDashboard';
+import { WorkHub } from '@/features/teacher/WorkHub';
+import { InsightsView } from '@/features/teacher/InsightsView';
 import { ClassesList } from '@/features/teacher/ClassesList';
 import { ClassDetail } from '@/features/teacher/ClassDetail';
 import { StudentsList } from '@/features/teacher/StudentsList';
@@ -115,19 +117,23 @@ export const AppRoutes: React.FC = () => {
         <Route path="dashboard" element={<TeacherDashboard />} />
         <Route path="classes" element={<ClassesList />} />
         <Route path="classes/:classId" element={<ClassDetail />} />
+        <Route path="work" element={<WorkHub />} />
+        <Route path="assignments" element={<Navigate to="/teacher/work" replace />} />
+        <Route path="assignments/new" element={<CreateAssignment />} />
+        <Route path="assignments/create" element={<CreateAssignment />} />
+        <Route path="homework" element={<Navigate to="/teacher/work" replace />} />
+        <Route path="tests" element={<Navigate to="/teacher/work" replace />} />
+        <Route path="tests/new" element={<CreateTest />} />
+        <Route path="tests/create" element={<CreateTest />} />
+        <Route path="submissions" element={<Navigate to="/teacher/work" replace />} />
+        <Route path="submissions/:id" element={<EvaluationView />} />
         <Route path="students" element={<StudentsList />} />
         <Route path="students/:studentId" element={<TeacherStudentProfile />} />
-        <Route path="assignments" element={<AssignmentsList />} />
-        <Route path="assignments/new" element={<CreateAssignment />} />
-        <Route path="homework" element={<HomeworkList />} />
-        <Route path="tests" element={<TestsList />} />
-        <Route path="tests/new" element={<CreateTest />} />
         <Route path="attendance" element={<AttendanceView />} />
-        <Route path="submissions" element={<SubmissionsList />} />
-        <Route path="submissions/:id" element={<EvaluationView />} />
-        <Route path="analytics" element={<AnalyticsView />} />
-        <Route path="intelligence" element={<ClassIntelligence />} />
-        <Route path="interventions" element={<InterventionsView />} />
+        <Route path="insights" element={<InsightsView />} />
+        <Route path="analytics" element={<Navigate to="/teacher/insights" replace />} />
+        <Route path="intelligence" element={<Navigate to="/teacher/insights" replace />} />
+        <Route path="interventions" element={<Navigate to="/teacher/insights" replace />} />
         <Route path="materials" element={<MaterialsView />} />
         <Route path="settings" element={<TeacherSettings />} />
       </Route>

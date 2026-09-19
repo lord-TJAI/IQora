@@ -181,7 +181,7 @@ export const PracticeView: React.FC = () => {
     if (!currentQuestion) return;
 
     let correct = false;
-    if (currentQuestion.type === 'calculation' || currentQuestion.type === 'numerical') {
+    if (currentQuestion.type === 'calculation') {
       const parsedUser = parseFloat(numericalInput.trim());
       const parsedCorrect = parseFloat(String(currentQuestion.correctAnswer));
       correct = !isNaN(parsedUser) && Math.abs(parsedUser - parsedCorrect) < 0.1;
@@ -544,7 +544,7 @@ export const PracticeView: React.FC = () => {
                 </h3>
 
                 {/* Question Input Types (NOT just MCQ!) */}
-                {currentQuestion.type === 'calculation' || currentQuestion.type === 'numerical' ? (
+                {currentQuestion.type === 'calculation' ? (
                   /* Numerical Input Box */
                   <div className="space-y-3">
                     <label className="text-xs font-bold text-[#667085] block">

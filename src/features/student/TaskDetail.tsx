@@ -214,7 +214,7 @@ export const TaskDetail: React.FC = () => {
                 <span className="text-[10px] font-black uppercase tracking-wider text-[#7C4DFF] bg-[#F5F0FF] px-2.5 py-0.5 rounded-full">
                   {task.subjectName}
                 </span>
-                <span className="text-xs text-[#667085]">{task.className}</span>
+                <span className="text-xs text-[#667085]">Class {task.classId}</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-[#172033] tracking-tight">
                 {task.title}

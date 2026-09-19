@@ -21,7 +21,7 @@ import { cn } from '@/utils/cn';
 export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { adminData, switchRole, logout } = useAuthStore();
+  const { adminData, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -29,10 +29,8 @@ export const AdminLayout: React.FC = () => {
     { to: '/admin/students', label: 'Students', icon: GraduationCap },
     { to: '/admin/teachers', label: 'Teachers', icon: Users },
     { to: '/admin/classes', label: 'Classes', icon: School },
-    { to: '/admin/subjects', label: 'Curriculum & Subjects', icon: BookOpen },
-    { to: '/admin/academic-year', label: 'Academic Year', icon: Calendar },
-    { to: '/admin/reports', label: 'Institutional Reports', icon: FileBarChart },
-    { to: '/admin/settings', label: 'Settings', icon: Settings },
+    { to: '/admin/subjects', label: 'Subjects', icon: BookOpen },
+    { to: '/admin/reports', label: 'Reports', icon: FileBarChart },
   ];
 
   return (
